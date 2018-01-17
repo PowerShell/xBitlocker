@@ -425,7 +425,8 @@ function CheckForPreReqs
         Write-Error "The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used"
     }
 
-    if ($blAdminToolsRemoteFeature.InstallState -ne "Installed")
+    if ($blAdminToolsRemoteFeature.InstallState -ne "Installed" -and (Get-OSEdition) -notmatch "Core")
+    #if ($blAdminToolsRemoteFeature.InstallState -ne "Installed")
     {
         $hasAllPreReqs = $false
 
@@ -517,5 +518,15 @@ function RemoveParameters
         }
     }
 }
+
+<#
+.SYNOPSIS
+Returns the OS edtion we currently running on
+#>
+function Get-OSEdition
+{
+    (Get-ItemProperty -Path "HKLM:/software/microsoft/windows nt/currentversion" -Name InstallationType).InstallationType
+}
+
 
 Export-ModuleMember -Function *
