@@ -1,12 +1,10 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/wi5i60tojfd7056b/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xbitlocker/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/wi5i60tojfd7056b/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xbitlocker/branch/master)
 
 # xBitlocker
 The **xBitlocker** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources produced by the PowerShell Team.
 This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm** resources.
 This DSC Module allows you to configure Bitlocker on a single disk, configure a TPM chip, or automatically enable Bitlocker on multiple disks.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -101,11 +99,8 @@ Defaults to false.
 ## Versions
 
 ### Unreleased
-* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
-
+* Corrected an issue in CheckForPreReqs function where on Server Core the installation of the non existing Windows Feature 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool' was erroneously checked.
 ### 1.1.0.0
-
-* Versioning updates
 
 ### 1.0.1.1
 
