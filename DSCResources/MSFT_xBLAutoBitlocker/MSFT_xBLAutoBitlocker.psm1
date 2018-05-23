@@ -70,7 +70,8 @@ function Get-TargetResource
         $UsedSpaceOnly
     )
 
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
@@ -152,7 +153,8 @@ function Set-TargetResource
         $UsedSpaceOnly
     )
     
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
@@ -254,7 +256,8 @@ function Test-TargetResource
         $UsedSpaceOnly
     )
 
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
@@ -375,7 +378,11 @@ function GetAutoBitlockerStatus
         foreach ($blv in $allBlvs)
         {
             $vol = $null
-            $vol = Get-Volume -Path $blv.MountPoint -ErrorAction SilentlyContinue | where {$_.DriveType -like $DriveType}
+            if ($blv.MountPoint -like "?:") {
+                $vol = Get-Volume -DriveLetter ($blv.MountPoint).TrimEnd(":") -ErrorAction SilentlyContinue | Where-Object {$_.DriveType -like $DriveType}
+            } else {
+                $vol = Get-Volume -Path $blv.MountPoint -ErrorAction SilentlyContinue | Where-Object {$_.DriveType -like $DriveType}
+            }
 
             if ($vol -ne $null)
             {
