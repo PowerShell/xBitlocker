@@ -152,7 +152,7 @@ function Set-TargetResource
         [System.Boolean]
         $UsedSpaceOnly
     )
-    
+
     #Load helper module
     Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
@@ -380,11 +380,11 @@ function GetAutoBitlockerStatus
             "Fixed" { $blDriveType = 1 }
             "Removable" { $blDriveType = 2 }
         }
-    
+
         foreach ($blv in $allBlvs)
         {
             $vol = $null
-            
+
             if (Split-Path -Path $blv.MountPoint -IsAbsolute) {
                 # MountPoint is a Drive Letter
                 $vol = Get-WmiObject -Namespace "root\cimv2\security\microsoftvolumeencryption" -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $blDriveType)}
