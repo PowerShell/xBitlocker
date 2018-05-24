@@ -40,7 +40,7 @@ It does not work on Operating System drives.
 **xBLAutoBitlocker** has the following properties.
 Where no description is listed, properties correspond directly to [Enable-Bitlocker](http://technet.microsoft.com/en-us/library/jj649837.aspx) parameters.
 
-*   *DriveType:The type of volume, as reported by Get-Volume, to auto apply Bitlocker to 
+*   *DriveType:The type of volume to auto apply Bitlocker to. Valid values are "Fixed" or "Removable"
 *   *PrimaryProtector:The primary protector type to be used for AutoBitlocker.
 Valid values are: "AdAccountOrGroupProtector", "PasswordProtector", "Pin", "RecoveryKeyProtector", "RecoveryPasswordProtector", "StartupKeyProtector", or "TpmProtector" 
 *   MinDiskCapacityGB:If specified, only disks this size or greater will auto apply Bitlocker 
@@ -102,6 +102,8 @@ Defaults to false.
 
 ### Unreleased
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
+* Fixed issue which caused xBLAutoBitlocker to incorrectly detect Fixed vs Removable volumes
+* Fixed issue which made xBLAutoBitlocker unable to encrypt volumes with drive letters assigned
 
 ### 1.1.0.0
 
