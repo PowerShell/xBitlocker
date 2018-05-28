@@ -125,7 +125,7 @@ Defaults to false.
 * Added Codecov support.
 * Updated appveyor.yml to use the one in template.
 * Added folders for future unit and integration tests.
-* Added Visual Studio Code formmatting settings.
+* Added Visual Studio Code formatting settings.
 * Added .gitignore file.
 * Added markdown lint rules.
 * Fixed encoding on README.md.
