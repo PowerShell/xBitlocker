@@ -126,6 +126,7 @@ Defaults to false.
 * Updated appveyor.yml to use the one in template.
 * Added folders for future unit and integration tests.
 * Added Visual Studio Code formmatting settings.
+* Added .gitingore file.
 
 ### 1.1.0.0
 
