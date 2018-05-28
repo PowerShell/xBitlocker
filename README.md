@@ -127,6 +127,7 @@ Defaults to false.
 * Added folders for future unit and integration tests.
 * Added Visual Studio Code formmatting settings.
 * Added .gitingore file.
+* Added markdown lint rules.
 
 ### 1.1.0.0
 
