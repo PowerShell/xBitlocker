@@ -152,7 +152,7 @@ function Set-TargetResource
         [System.Boolean]
         $UsedSpaceOnly
     )
-    
+
     #Load helper module
     Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
@@ -376,21 +376,33 @@ function GetAutoBitlockerStatus
         [Hashtable]$returnValue = @{}
 
         # Convert DriveType into values returned by Win32_EncryptableVolume.VolumeType
-        switch ($DriveType) {
-            "Fixed" { $blDriveType = 1 }
-            "Removable" { $blDriveType = 2 }
+        switch ($DriveType)
+        {
+            "Fixed"
+            {
+                $DriveTypeValue = 1
+            }
+            "Removable"
+            {
+                $DriveTypeValue = 2
+            }
         }
-    
+
         foreach ($blv in $allBlvs)
         {
             $vol = $null
-            
-            if (Split-Path -Path $blv.MountPoint -IsAbsolute) {
+
+            $EncryptableVolumes=Get-CimInstance -Namespace "root\cimv2\security\microsoftvolumeencryption" -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue
+
+            if (Split-Path -Path $blv.MountPoint -IsAbsolute)
+            {
                 # MountPoint is a Drive Letter
-                $vol = Get-WmiObject -Namespace "root\cimv2\security\microsoftvolumeencryption" -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $blDriveType)}
-            } else {
+                $vol = $EncryptableVolumes | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $DriveTypeValue)}
+            }
+            else
+            {
                 # MountPoint is a path
-                $vol = Get-WmiObject -Namespace "root\cimv2\security\microsoftvolumeencryption" -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue | Where-Object {($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $blDriveType)}
+                $vol = $EncryptableVolumes | Where-Object {($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $DriveTypeValue)}
             }
 
             if ($vol -ne $null)
