@@ -24,7 +24,7 @@ Copyright = '(c) 2018 Microsoft Corporation. All rights reserved.'
 Description = 'This DSC Module allows you to configure Bitlocker on a single disk, configure a TPM chip, or automatically enable Bitlocker on multiple disks.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '4.0'
+PowerShellVersion = '5.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -70,6 +70,9 @@ VariablesToExport = '*'
 
 # Aliases to export from this module
 AliasesToExport = '*'
+
+# DSC Resources to export from this module
+DscResourcesToExport = '*'
 
 # List of all modules packaged with this module
 # ModuleList = @()
