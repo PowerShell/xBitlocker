@@ -1,0 +1,8 @@
+[ClassVersion("1.0.0.0"), FriendlyName("xWaitForBLEncryption")]
+class MSFT_xWaitForBLEncryption : OMI_BaseResource
+{
+    [Key] String Identity; //Not actually used, so could be anything
+    [Write] String LogicalUnit;
+    [Write] UInt32 RetryIntervalSeconds;
+    [Write] UInt32 RetryCount;
+};
