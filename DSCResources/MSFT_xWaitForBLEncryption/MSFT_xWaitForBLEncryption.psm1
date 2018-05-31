@@ -1,5 +1,5 @@
 [DscResource()]
-class WaitForBLEncryption {
+class xWaitForBLEncryption {
 
     [DscProperty(Key, Mandatory)]
     [string] $LogicalUnit
@@ -39,7 +39,7 @@ class WaitForBLEncryption {
         return $this.TestStatus($this.LogicalUnit)
     }
 
-    [WaitForBLEncryption] Get()
+    [xWaitForBLEncryption] Get()
     {
         $present = $this.TestStatus($this.LogicalUnit)
 

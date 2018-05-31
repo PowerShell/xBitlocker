@@ -72,7 +72,7 @@ VariablesToExport = '*'
 AliasesToExport = '*'
 
 # DSC Resources to export from this module
-DscResourcesToExport = 'WaitForBLEncryption'
+DscResourcesToExport = 'xWaitForBLEncryption'
 
 # List of all modules packaged with this module
 # ModuleList = @()
