@@ -6,7 +6,8 @@ try
 {
     InModuleScope "xBitlockerCommon" {
 
-        function Get-BitlockerVolume {
+        function Get-BitlockerVolume
+        {
             param
             (
                 [Parameter()]
@@ -69,6 +70,7 @@ try
                     TestBitlocker -MountPoint 'C:' -PrimaryProtector 'TPMProtector' -RecoveryPasswordProtector $true -verbose | Should -Be $true
                 }
             }
+
             Context 'When OS Volume is Decrypted, but has TPM and Recovery Password Protectors assigned' {
                 Mock `
                     -CommandName Get-BitlockerVolume `
