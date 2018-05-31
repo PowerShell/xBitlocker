@@ -86,7 +86,7 @@ function EnableBitlocker
         {
             throw "A TpmProtector must be used if Pin is used."
         }
-    
+
         if ($PSBoundParameters.ContainsKey("AdAccountOrGroupProtector") -and $PrimaryProtector -notlike "AdAccountOrGroupProtector" -and !(ContainsKeyProtector -Type "AdAccountOrGroup" -KeyProtectorCollection $blv.KeyProtector))
         {
             Write-Verbose "Adding AdAccountOrGroupProtector"
@@ -164,7 +164,7 @@ function EnableBitlocker
                 $handledTpmAlready = $true
 
                 $params.Add("Pin", $Pin.Password)
-                
+
                 if ($PSBoundParameters.ContainsKey("StartupKeyProtector"))
                 {
                     $params.Add("TpmAndPinAndStartupKeyProtector", $true)
@@ -181,7 +181,7 @@ function EnableBitlocker
                 $handledTpmAlready = $true
 
                 $params.Add("TpmAndStartupKeyProtector", $true)
-                $params.Add("StartupKeyPath", $StartupKeyPath)                
+                $params.Add("StartupKeyPath", $StartupKeyPath)
             }
 
 
@@ -325,6 +325,11 @@ function TestBitlocker
         Write-Verbose "Unable to locate MountPoint: $($MountPoint)"
         return $false
     }
+    elseif ($blv.VolumeStatus -eq "FullyDecrypted")
+    {
+        Write-Verbose "MountPoint: $($MountPoint) Not Encrypted"
+        return $false
+    }
     elseif ($blv.KeyProtector -eq $null -or $blv.KeyProtector.Count -eq 0)
     {
         Write-Verbose "No key protectors on MountPoint: $($MountPoint)"
@@ -352,7 +357,7 @@ function TestBitlocker
         if ($PSBoundParameters.ContainsKey("Pin") -and !(ContainsKeyProtector -Type "TpmPin" -KeyProtectorCollection $blv.KeyProtector -StartsWith $true))
         {
             Write-Verbose "MountPoint '$($MountPoint) 'does not have TpmPin assigned."
-            return $false            
+            return $false
         }
 
         if ($PSBoundParameters.ContainsKey("RecoveryKeyProtector") -and !(ContainsKeyProtector -Type "ExternalKey" -KeyProtectorCollection $blv.KeyProtector))
@@ -383,7 +388,7 @@ function TestBitlocker
                 {
                     Write-Verbose "MountPoint '$($MountPoint) 'does not have TPM + StartupKey protector."
                     return $false
-                }          
+                }
             }
         }
 
@@ -397,7 +402,7 @@ function TestBitlocker
     return $true
 }
 
-#Ensures that required Bitlocker prereqs are installed 
+#Ensures that required Bitlocker prereqs are installed
 function CheckForPreReqs
 {
     $hasAllPreReqs = $true

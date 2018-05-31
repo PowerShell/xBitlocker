@@ -131,6 +131,8 @@ Defaults to false.
 * Fixed encoding on README.md.
 * Added `PowerShellVersion = '4.0'`, and updated copyright information, in the
   module manifest.
+* Fixed issue which caused Test to incorrectly succeed on fully decrypted volumes when correct Key Protectors were present ([issue #13](https://github.com/PowerShell/xBitlocker/issues/13))
+
 
 ### 1.1.0.0
 
