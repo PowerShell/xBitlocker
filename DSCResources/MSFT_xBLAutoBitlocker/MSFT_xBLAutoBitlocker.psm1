@@ -378,13 +378,13 @@ function GetAutoBitlockerStatus
         # Convert DriveType into values returned by Win32_EncryptableVolume.VolumeType
         switch ($DriveType)
         {
-            "Fixed"
+            'Fixed'
             {
-                $DriveTypeValue = 1
+                $driveTypeValue = 1
             }
-            "Removable"
+            'Removable'
             {
-                $DriveTypeValue = 2
+                $driveTypeValue = 2
             }
         }
 
@@ -392,17 +392,17 @@ function GetAutoBitlockerStatus
         {
             $vol = $null
 
-            $EncryptableVolumes=Get-CimInstance -Namespace "root\cimv2\security\microsoftvolumeencryption" -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue
+            $encryptableVolumes = Get-CimInstance -Namespace 'root\cimv2\security\microsoftvolumeencryption' -Class Win32_Encryptablevolume -ErrorAction SilentlyContinue
 
             if (Split-Path -Path $blv.MountPoint -IsAbsolute)
             {
                 # MountPoint is a Drive Letter
-                $vol = $EncryptableVolumes | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $DriveTypeValue)}
+                $vol = $encryptableVolumes | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue)}
             }
             else
             {
                 # MountPoint is a path
-                $vol = $EncryptableVolumes | Where-Object {($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $DriveTypeValue)}
+                $vol = $encryptableVolumes | Where-Object {($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue)}
             }
 
             if ($vol -ne $null)
