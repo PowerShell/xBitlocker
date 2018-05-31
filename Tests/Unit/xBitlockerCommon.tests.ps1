@@ -50,6 +50,9 @@ try
     Invoke-TestSetup
 
     InModuleScope "xBitlockerCommon" {
+
+        function Get-BitlockerVolume {
+        }
         # TODO: Optionally create any variables here for use by your tests
 
         # TODO: Complete the Describe blocks below and add more as needed.
