@@ -2,7 +2,7 @@ $moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Import-Module (Join-Path -Path $moduleRoot -ChildPath '\Misc\xBitlockerCommon.psm1')
 
 InModuleScope 'xBitlockerCommon' {
-        Describe 'xBitlockerCommon' {
+    Describe 'xBitlockerCommon' {
         #Empty function so we can mock Get-WindowsFeature Cmdlet
         function Get-WindowsFeature
         {
@@ -14,9 +14,9 @@ InModuleScope 'xBitlockerCommon' {
 
         }
 
-        Context "Verifing PreReqs on Windows Server Core with all required features" {
+        Context "When OS is Windows Server Core and all required features are installed" {
             Mock -CommandName Get-OSEdition -MockWith {
-                "Server Core"
+                'Server Core'
             }
 
             Mock -CommandName Get-WindowsFeature -MockWith {
@@ -25,15 +25,16 @@ InModuleScope 'xBitlockerCommon' {
                     [string]
                     $FeatureName
                 )
-                
-                if($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
+
+                if ($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
                 {
                     return $null
                 }
-                else {
+                else
+                {
                     return @{
-                        DisplayName = $FeatureName
-                        Name = $FeatureName
+                        DisplayName  = $FeatureName
+                        Name         = $FeatureName
                         InstallState = 'Installed'
                     }
                 }
@@ -44,9 +45,9 @@ InModuleScope 'xBitlockerCommon' {
             }
         }
 
-        Context "Verifing PreReqs on Full Server with all required features" {
+        Context "When OS is Full Server and all required features are installed" {
             Mock -CommandName Get-OSEdition -MockWith {
-                return "Server"
+                return 'Server'
             }
 
             Mock -CommandName Get-WindowsFeature -MockWith {
@@ -55,21 +56,22 @@ InModuleScope 'xBitlockerCommon' {
                     [string]
                     $FeatureName
                 )
-    
-                return @{
-                    DisplayName = $FeatureName
-                    Name = $FeatureName
+
+                return
+                @{
+                    DisplayName  = $FeatureName
+                    Name         = $FeatureName
                     InstallState = 'Installed'
                 }
             }
             It "Should run the CheckForPreReqs function without exceptions" {
-                CheckForPreReqs
+                CheckForPreReqs | Should -Not -Throw
             }
         }
 
-        Context "Verifing PreReqs on Full Server without the required features 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool'" {
+        Context "When OS is Full Server without the required features ('RSAT-Feature-Tools-BitLocker-RemoteAdminTool') installed" {
             Mock -CommandName Get-OSEdition -MockWith {
-                return "Server"
+                return 'Server'
             }
 
             Mock -CommandName Get-WindowsFeature -MockWith {
@@ -78,15 +80,17 @@ InModuleScope 'xBitlockerCommon' {
                     [string]
                     $FeatureName
                 )
-                
-                if($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
+
+                if ($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
                 {
                     return $null
                 }
-                else {
-                    return @{
-                        DisplayName = $FeatureName
-                        Name = $FeatureName
+                else
+                {
+                    return
+                    @{
+                        DisplayName  = $FeatureName
+                        Name         = $FeatureName
                         InstallState = 'Installed'
                     }
                 }
@@ -96,10 +100,6 @@ InModuleScope 'xBitlockerCommon' {
             }
         }
     }
-
-
-
-
 }
 
 
