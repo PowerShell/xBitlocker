@@ -4,9 +4,6 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $Identity
     )
 
     #Load helper module
@@ -19,7 +16,7 @@ function Get-TargetResource
     if ($status -ne $null)
     {
         $returnValue = @{
-            Identity = $Identity
+            Status = $status.ProtectionStatus
         }
     }
 
@@ -31,10 +28,6 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $Identity,
-
         [parameter(Mandatory = $true)]
         [System.String]
         $LogicalUnit,
@@ -51,7 +44,7 @@ function Set-TargetResource
 
     CheckForPreReqs
 
-    $PSBoundParameters.Remove("Identity") | Out-Null
+    #$PSBoundParameters.Remove("Identity") | Out-Null
 
     $encrypted = TestStatus($LogicalUnit)
 
@@ -76,10 +69,6 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $Identity,
-
         [parameter(Mandatory = $true)]
         [System.String]
         $LogicalUnit
