@@ -41,7 +41,7 @@ InModuleScope 'xBitlockerCommon' {
             }
 
             It "Should run the CheckForPreReqs function without exceptions" {
-                CheckForPreReqs
+                {CheckForPreReqs} | Should -Not -Throw
             }
         }
 
@@ -57,15 +57,15 @@ InModuleScope 'xBitlockerCommon' {
                     $FeatureName
                 )
 
-                return
-                @{
+                return @{
                     DisplayName  = $FeatureName
                     Name         = $FeatureName
                     InstallState = 'Installed'
                 }
             }
+
             It "Should run the CheckForPreReqs function without exceptions" {
-                CheckForPreReqs | Should -Not -Throw
+                {CheckForPreReqs} | Should -Not -Throw
             }
         }
 
@@ -87,8 +87,8 @@ InModuleScope 'xBitlockerCommon' {
                 }
                 else
                 {
-                    return
-                    @{
+
+                    return @{
                         DisplayName  = $FeatureName
                         Name         = $FeatureName
                         InstallState = 'Installed'
