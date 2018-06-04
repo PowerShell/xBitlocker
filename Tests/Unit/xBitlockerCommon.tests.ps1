@@ -4,7 +4,7 @@ Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -P
 # Begin Testing
 try
 {
-    InModuleScope "xBitlockerCommon" {
+    InModuleScope 'xBitlockerCommon' {
 
         function Get-BitlockerVolume
         {
@@ -16,7 +16,21 @@ try
             )
         }
 
-        Describe "xBitlockerCommon\TestBitlocker" {
+        function Get-WindowsFeature
+        {
+            param
+            (
+                [string]
+                $FeatureName
+            )
+        }
+
+        function Get-OSEdition
+        {
+
+        }
+
+        Describe 'xBitlockerCommon\TestBitlocker' {
 
             Context 'When OS Volume is not Encrypted and No Key Protectors Assigned' {
                 Mock `
@@ -98,6 +112,86 @@ try
 
                 It 'Should Fail The Test (TPM and RecoveryPassword Protectors)' {
                     TestBitlocker -MountPoint 'C:' -PrimaryProtector 'TPMProtector' -RecoveryPasswordProtector $true | Should -Be $false
+                }
+            }
+
+            Context 'When OS is Windows Server Core and all required features are installed' {
+                Mock -CommandName Get-OSEdition -MockWith {
+                    'Server Core'
+                }
+
+                Mock -CommandName Get-WindowsFeature -MockWith {
+                    if ($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
+                    {
+                        return $null
+                    }
+                    else
+                    {
+                        return @{
+                            DisplayName  = $FeatureName
+                            Name         = $FeatureName
+                            InstallState = 'Installed'
+                        }
+                    }
+                }
+
+                It 'Should run the CheckForPreReqs function without exceptions' {
+                    {CheckForPreReqs} | Should -Not -Throw
+                }
+            }
+
+            Context 'When OS is Full Server and all required features are installed' {
+                Mock -CommandName Get-OSEdition -MockWith {
+                    return 'Server'
+                }
+
+                Mock -CommandName Get-WindowsFeature -MockWith {
+                    param
+                    (
+                        [string]
+                        $FeatureName
+                    )
+
+                    return @{
+                        DisplayName  = $FeatureName
+                        Name         = $FeatureName
+                        InstallState = 'Installed'
+                    }
+                }
+
+                It 'Should run the CheckForPreReqs function without exceptions' {
+                    {CheckForPreReqs} | Should -Not -Throw
+                }
+            }
+
+            Context 'When OS is Full Server without the required features (RSAT-Feature-Tools-BitLocker-RemoteAdminTool) installed' {
+                Mock -CommandName Get-OSEdition -MockWith {
+                    return 'Server'
+                }
+
+                Mock -CommandName Get-WindowsFeature -MockWith {
+                    param
+                    (
+                        [string]
+                        $FeatureName
+                    )
+
+                    if ($FeatureName -eq 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool')
+                    {
+                        return $null
+                    }
+                    else
+                    {
+
+                        return @{
+                            DisplayName  = $FeatureName
+                            Name         = $FeatureName
+                            InstallState = 'Installed'
+                        }
+                    }
+                }
+                It 'The CheckForPreReqs function should throw an exceptions about missing Windows Feature' {
+                    {CheckForPreReqs} | Should -Throw 'Required Bitlocker features need to be installed before xBitlocker can be used'
                 }
             }
         }
