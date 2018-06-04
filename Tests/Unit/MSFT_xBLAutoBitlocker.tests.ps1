@@ -19,8 +19,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 function Invoke-TestCleanup {
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-
-
 }
 
 # Begin Testing
@@ -98,7 +96,6 @@ try
                         AutoUnlockEnabled = $null
                         ProtectionStatus = 'Off'
                     },
-
                     @{
                         # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
                         VolumeType = 'Data'
@@ -148,7 +145,8 @@ try
 
                 switch ($Path)
                 {
-                    '\\?\Volume{00000000-0000-0000-0000-000000000001}\' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                    {
                         return @{
                             # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
                             DriveLetter = ''
@@ -156,7 +154,8 @@ try
                             DriveType = 'Fixed'
                         }
                     }
-                    '\\?\Volume{00000000-0000-0000-0000-000000000002}\' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                    {
                         return @{
                             # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
                             DriveLetter = ''
@@ -164,7 +163,8 @@ try
                             DriveType = 'Fixed'
                         }
                     }
-                    '\\?\Volume{00000000-0000-0000-0000-000000000003}\' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                    {
                         return @{
                             # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
                             DriveLetter = ''
@@ -172,8 +172,9 @@ try
                             DriveType = 'Removable'
                         }
                     }
-                    default {
-                        return $null
+                    default
+                    {
+                        throw "No MSFT_Volume objects found with property 'Path' equal to '$Path'.  Verify the value of the property and retry."
                     }
                 }
             }
