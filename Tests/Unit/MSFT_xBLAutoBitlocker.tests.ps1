@@ -17,10 +17,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion HEADER
 
-function Invoke-TestSetup {
-
-}
-
 function Invoke-TestCleanup {
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 
@@ -30,8 +26,6 @@ function Invoke-TestCleanup {
 # Begin Testing
 try
 {
-    Invoke-TestSetup
-
     InModuleScope 'MSFT_xBLAutoBitlocker' {
 
         function Get-BitLockerVolume {
@@ -103,6 +97,43 @@ try
                         )
                         AutoUnlockEnabled = $null
                         ProtectionStatus = 'Off'
+                    },
+
+                    @{
+                        # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                        VolumeType = 'Data'
+                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                        CapacityGB = 500
+                        VolumeStatus = 'FullyDecrypted'
+                        EncryptionPercentage = 0
+                        KeyProtector = @(
+                        )
+                        AutoUnlockEnabled = $null
+                        ProtectionStatus = 'Off'
+                    },
+                    @{
+                        # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                        VolumeType = 'Data'
+                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                        CapacityGB = 500
+                        VolumeStatus = 'FullyDecrypted'
+                        EncryptionPercentage = 0
+                        KeyProtector = @(
+                        )
+                        AutoUnlockEnabled = $null
+                        ProtectionStatus = 'Off'
+                    }
+                    @{
+                        # 3 is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
+                        VolumeType = 'Data'
+                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                        CapacityGB = 500
+                        VolumeStatus = 'FullyDecrypted'
+                        EncryptionPercentage = 0
+                        KeyProtector = @(
+                        )
+                        AutoUnlockEnabled = $null
+                        ProtectionStatus = 'Off'
                     }
                 )
             }
@@ -114,46 +145,35 @@ try
             -ModuleName 'MSFT_xBLAutoBitlocker' `
             -MockWith {
                 # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
-                #param
-                #(
-                #    [Parameter()]
-                #    [System.String]
-                #    $Path
-                #)
 
                 switch ($Path)
                 {
-                    'C:' {
-                        return @{
-                            # C: is OS drive
-                            DriveLetter = 'C'
-                            Path = 'C:'
-                            DriveType = 'Fixed'
-                        }
-                    }
-                    'D:' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000001}\' {
                         return @{
                             # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                            DriveLetter = 'D'
-                            Path = 'D:'
+                            DriveLetter = ''
+                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
                             DriveType = 'Fixed'
                         }
                     }
-                    'E:' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000002}\' {
                         return @{
-                            # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
-                            DriveLetter = 'E'
-                            Path = 'E:'
+                            # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = ''
+                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
                             DriveType = 'Fixed'
                         }
                     }
-                    'F:' {
+                    '\\?\Volume{00000000-0000-0000-0000-000000000003}\' {
                         return @{
-                            # F: is a Removable drive, correctly reporting as Fixed to Bitlocker
-                            DriveLetter = 'F'
-                            Path = 'F:'
+                            # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = ''
+                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
                             DriveType = 'Removable'
                         }
+                    }
+                    default {
+                        return $null
                     }
                 }
             }
@@ -168,22 +188,48 @@ try
                         # C: is OS drive
                         DriveLetter = 'C:'
                         VolumeType=0
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000000}\'
+
                     },
                     @{
                         # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
                         DriveLetter = 'D:'
                         VolumeType=2
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000004}\'
+
                     },
                     @{
                         # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
                         DriveLetter = 'E:'
                         VolumeType=1
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000005}\'
+
                     },
                     @{
                         # F: is a Removable drive, correctly reporting as Fixed to Bitlocker
                         DriveLetter = 'F:'
                         VolumeType=2
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000006}\'
+                    },
+                    @{
+                        # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                        DriveLetter = ''
+                        VolumeType=2
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                    },
+                    @{
+                        # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                        DriveLetter = ''
+                        VolumeType=1
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                    },
+                    @{
+                        # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
+                        DriveLetter = ''
+                        VolumeType=2
+                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000003}\'
                     }
+
                 )
             }
 
@@ -221,6 +267,7 @@ try
                     (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'E:'
                 }
             }
+
             Context 'When Volume F: Reports as Removable to OS and Bitlocker' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
@@ -229,6 +276,39 @@ try
 
                 It 'Should Be In The List of Eligible Removable Volumes' {
                     (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'F:'
+                }
+            }
+
+            Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000001}\ Reports Fixed to OS, but Removable to Bitlocker' {
+
+                It 'Should Not Be In The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                }
+
+                It 'Should Be In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                }
+            }
+
+            Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000002}\ Reports Fixed to OS and Bitlocker' {
+
+                It 'Should Be In The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                }
+
+                It 'Should Not Be In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                }
+            }
+
+            Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000003}\ Reports as Removable to OS and Bitlocker' {
+
+                It 'Should Not Be In The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                }
+
+                It 'Should Be In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
                 }
             }
         }
