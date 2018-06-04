@@ -131,6 +131,7 @@ Defaults to false.
 * Fixed encoding on README.md.
 * Added `PowerShellVersion = '4.0'`, and updated copyright information, in the
   module manifest.
+* Fixed issue which caused Test to incorrectly succeed on fully decrypted volumes when correct Key Protectors were present ([issue #13](https://github.com/PowerShell/xBitlocker/issues/13))
 * Fixed issue which caused xBLAutoBitlocker to incorrectly detect Fixed vs Removable volumes. ([issue #11](https://github.com/PowerShell/xBitlocker/issues/11))
 * Fixed issue which made xBLAutoBitlocker unable to encrypt volumes with drive letters assigned. ([issue #10](https://github.com/PowerShell/xBitlocker/issues/10))
 
