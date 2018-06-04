@@ -80,7 +80,13 @@ function Test-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $LogicalUnit
+        $LogicalUnit,
+
+        [System.UInt32]
+        $RetryIntervalSec = 60,
+
+        [System.UInt32]
+        $RetryCount = 30
     )
 
     #Load helper module
