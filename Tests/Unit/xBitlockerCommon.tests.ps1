@@ -30,6 +30,11 @@ try
 
         }
 
+        function Write-Error
+        {
+
+        }
+
         Describe 'xBitlockerCommon\TestBitlocker' {
 
             Context 'When OS Volume is not Encrypted and No Key Protectors Assigned' {
@@ -191,7 +196,12 @@ try
                     }
                 }
                 It 'The CheckForPreReqs function should throw an exceptions about missing Windows Feature' {
+                    Mock -CommandName Write-Error -MockWith {
+                        Throw 'Required Bitlocker features need to be installed before xBitlocker can be used'
+                    }
+
                     {CheckForPreReqs} | Should -Throw 'Required Bitlocker features need to be installed before xBitlocker can be used'
+                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It
                 }
             }
         }
