@@ -9,7 +9,7 @@ function Get-TargetResource
         $LogicalUnit,
 
         [System.UInt32]
-        $RetryIntervalSec = 60,
+        $RetryIntervalSeconds = 60,
 
         [System.UInt32]
         $RetryCount = 30
@@ -42,7 +42,7 @@ function Set-TargetResource
         $LogicalUnit,
 
         [System.UInt32]
-        $RetryIntervalSec = 60,
+        $RetryIntervalSeconds = 60,
 
         [System.UInt32]
         $RetryCount = 30
@@ -66,7 +66,7 @@ function Set-TargetResource
                 break
             }
             else {
-                Start-Sleep $RetryIntervalSec
+                Start-Sleep $RetryIntervalSeconds
             }
         }
     }
@@ -83,7 +83,7 @@ function Test-TargetResource
         $LogicalUnit,
 
         [System.UInt32]
-        $RetryIntervalSec = 60,
+        $RetryIntervalSeconds = 60,
 
         [System.UInt32]
         $RetryCount = 30
