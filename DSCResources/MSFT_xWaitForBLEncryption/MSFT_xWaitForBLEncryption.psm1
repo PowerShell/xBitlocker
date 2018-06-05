@@ -97,11 +97,11 @@ function Test-TargetResource
     return TestStatus($MountPoint)
 }
 
-function TestStatus([string] $Unit)
+function TestStatus([string] $unit)
 {
     $encrypted = $true
 
-    $status = Get-BitLockerVolume -MountPoint $Unit
+    $status = Get-BitLockerVolume -MountPoint $unit
 
     if (($status.ProtectionStatus -eq "On") -and ($status.EncryptionPercentage -ne 100))
     {
@@ -109,7 +109,7 @@ function TestStatus([string] $Unit)
     }
     elseif ($status -eq $null)
     {
-        throw "Unit $($Unit) is not a logical drive."
+        throw "Unit $($unit) is not a logical drive."
     }
 
     return $encrypted
@@ -117,7 +117,7 @@ function TestStatus([string] $Unit)
 
 function IsFullyEncrypted([string]$unit)
 {
-    $status = Get-BitLockerVolume -MountPoint "$($unit):"
+    $status = Get-BitLockerVolume -MountPoint $unit
 
     if ($status.EncryptionPercentage -eq 100)
     {
