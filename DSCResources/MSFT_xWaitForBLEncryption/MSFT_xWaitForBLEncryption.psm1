@@ -6,7 +6,7 @@ function Get-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $LogicalUnit,
+        $MountPoint,
 
         [System.UInt32]
         $RetryIntervalSeconds = 60,
@@ -39,7 +39,7 @@ function Set-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $LogicalUnit,
+        $MountPoint,
 
         [System.UInt32]
         $RetryIntervalSeconds = 60,
@@ -55,13 +55,13 @@ function Set-TargetResource
 
     #$PSBoundParameters.Remove("Identity") | Out-Null
 
-    $encrypted = TestStatus($LogicalUnit)
+    $encrypted = TestStatus($MountPoint)
 
     if (-not $encrypted)
     {
         for($count = 0; $count -lt $RetryCount; $count++)
         {
-            if (IsFullyEncrypted($LogicalUnit))
+            if (IsFullyEncrypted($MountPoint))
             {
                 break
             }
@@ -80,7 +80,7 @@ function Test-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $LogicalUnit,
+        $MountPoint,
 
         [System.UInt32]
         $RetryIntervalSeconds = 60,
@@ -94,14 +94,14 @@ function Test-TargetResource
 
     CheckForPreReqs
 
-    return TestStatus($LogicalUnit)
+    return TestStatus($MountPoint)
 }
 
 function TestStatus([string] $Unit)
 {
     $encrypted = $true
 
-    $status = Get-BitLockerVolume -MountPoint "$($Unit):"
+    $status = Get-BitLockerVolume -MountPoint $Unit
 
     if (($status.ProtectionStatus -eq "On") -and ($status.EncryptionPercentage -ne 100))
     {
