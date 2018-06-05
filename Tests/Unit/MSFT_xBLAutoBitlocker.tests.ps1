@@ -76,7 +76,7 @@ try
                         # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
                         VolumeType = 'Data'
                         MountPoint = 'E:'
-                        CapacityGB = 500
+                        CapacityGB = 50
                         VolumeStatus = 'FullyDecrypted'
                         EncryptionPercentage = 0
                         KeyProtector = @(
@@ -124,7 +124,7 @@ try
                         # 3 is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
                         VolumeType = 'Data'
                         MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
-                        CapacityGB = 500
+                        CapacityGB = 50
                         VolumeStatus = 'FullyDecrypted'
                         EncryptionPercentage = 0
                         KeyProtector = @(
@@ -239,77 +239,121 @@ try
             Context 'When Volume C: Reports as OS Volume' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector TpmProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'C:'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector TpmProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'C:'
                 }
 
                 It 'Should Not Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector TpmProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'C:'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector TpmProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'C:'
                 }
             }
 
             Context 'When Volume D: Reports Fixed to OS, but Removable to Bitlocker' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'D:'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'D:'
                 }
 
                 It 'Should Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'D:'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'D:'
                 }
             }
 
             Context 'When Volume E: Reports Fixed to OS and Bitlocker' {
 
                 It 'Should Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'E:'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'E:'
                 }
 
                 It 'Should Not Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'E:'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'E:'
                 }
             }
 
             Context 'When Volume F: Reports as Removable to OS and Bitlocker' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'F:'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'F:'
                 }
 
                 It 'Should Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'F:'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'F:'
                 }
             }
 
             Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000001}\ Reports Fixed to OS, but Removable to Bitlocker' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
                 }
 
                 It 'Should Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
                 }
             }
 
             Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000002}\ Reports Fixed to OS and Bitlocker' {
 
                 It 'Should Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
                 }
 
                 It 'Should Not Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
                 }
             }
 
             Context 'When Volume \\?\Volume{00000000-0000-0000-0000-000000000003}\ Reports as Removable to OS and Bitlocker' {
 
                 It 'Should Not Be In The List of Eligible Fixed Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Fixed" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
                 }
 
                 It 'Should Be In The List of Eligible Removable Volumes' {
-                    (GetAutoBitlockerStatus -DriveType "Removable" -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                }
+            }
+
+            Context 'When MinDiskCapacity Parameter is Defined at 100 GB for Fixed Disks' {
+
+                It 'Should Exclude E: from The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector -MinDiskCapacityGB 100|Select-Object -ExpandProperty Keys)|Should -Not -Contain 'E:'
+                }
+
+                It 'Should Include Volume \\?\Volume{00000000-0000-0000-0000-000000000002}\ In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector -MinDiskCapacityGB 100|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                }
+            }
+
+            Context 'When MinDiskCapacity Parameter is Not Defined for Fixed Disks' {
+
+                It 'Should Include E: In The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'E:'
+                }
+
+                It 'Should Include Volume \\?\Volume{00000000-0000-0000-0000-000000000002}\ In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Fixed' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                }
+            }
+
+            Context 'When MinDiskCapacity Parameter is Defined at 100 GB for Removable Disks' {
+
+                It 'Should Exclude \\?\Volume{00000000-0000-0000-0000-000000000003}\ from The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector -MinDiskCapacityGB 100|Select-Object -ExpandProperty Keys)|Should -Not -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                }
+
+                It 'Should Include F: In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector -MinDiskCapacityGB 100|Select-Object -ExpandProperty Keys)|Should -Contain 'F:'
+                }
+            }
+
+            Context 'When MinDiskCapacity Parameter is Not Defined for Fixed Disks' {
+
+                It 'Should Include \\?\Volume{00000000-0000-0000-0000-000000000003}\ In The List of Eligible Fixed Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                }
+
+                It 'Should Include F: In The List of Eligible Removable Volumes' {
+                    (GetAutoBitlockerStatus -DriveType 'Removable' -PrimaryProtector RecoveryPasswordProtector|Select-Object -ExpandProperty Keys)|Should -Contain 'F:'
                 }
             }
         }
