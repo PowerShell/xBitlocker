@@ -103,7 +103,7 @@ function TestStatus([string] $unit)
 
     $status = Get-BitLockerVolume -MountPoint $unit
 
-    if (($status.ProtectionStatus -eq "On") -and ($status.EncryptionPercentage -ne 100))
+    if ($status.EncryptionPercentage -ne 100)
     {
         $encrypted = $false
     }
