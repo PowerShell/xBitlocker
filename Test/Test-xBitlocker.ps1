@@ -97,6 +97,18 @@ $waitForBLEParams1 = @{
     MountPoint                = 'C:'
 }
 
+$waitForBLEParams2 = @{
+    MountPoint  = 'C:'
+    RetryIntervalSeconds = 20
+    RetryCount = 20
+}
+
+$waitForBLEParams3 = @{
+    MountPoint  = 'C:'
+    RetryIntervalSeconds = 30
+    RetryCount = 30
+}
+
 $autoBlParams1 = @{
     DriveType = "Fixed"
     MinDiskCapacityGB = 20
@@ -195,6 +207,8 @@ function RunTests
         RunTest -TestName "TestBitlocker8" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams8
         RunTest -TestName "TestBitlocker9" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams9
         RunTest -TestName "TestWaitFor" -ModulesToImport "MSFT_xWaitForBLEncryption" -Parameters $waitForBLEParams1
+        RunTest -TestName "TestWaitFor" -ModulesToImport "MSFT_xWaitForBLEncryption" -Parameters $waitForBLEParams2
+        RunTest -TestName "TestWaitFor" -ModulesToImport "MSFT_xWaitForBLEncryption" -Parameters $waitForBLEParams3
     }
 
     if ("TestAutoBitlocker" -like $Filter)

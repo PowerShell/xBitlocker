@@ -1,31 +1,48 @@
+<#
+.SYNOPSIS
+   Resource that waits for a drive to get encrypted before proceeding. Follows the Wait-For pattern.
+.DESCRIPTION
+.NOTES
+#>
+
 function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSeconds = 60,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 30
     )
 
-    #Load helper module
+    # Load helper module
     Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
-    $status = Get-BitLockerVolume
+    $status = Get-BitLockerVolume -MountPoint $MountPoint
 
     if ($status -ne $null)
     {
         $returnValue = @{
-            Status = $status.ProtectionStatus
+            Write-Verbose "Status for drive available."
+            Status = "$($MountPoint) drive ProtectionStatus is $($status.ProtectionStatus)."
+        }
+    }
+    else
+    {
+        $returnValue = @{
+            Write-Verbose "Status for drive unavailable."
+            Status = "No information could be retrieved for specified drive."
         }
     }
 
@@ -37,35 +54,39 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSeconds = 60,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 30
     )
 
-    #Load helper module
+    # Load helper module
     Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
-    #$PSBoundParameters.Remove("Identity") | Out-Null
-
-    $encrypted = TestStatus($MountPoint)
+    $encrypted = Test-Status($MountPoint)
 
     if (-not $encrypted)
     {
+        Write-Verbose "Not yet fully encrypted. About to start waiting loop."
         for($count = 0; $count -lt $RetryCount; $count++)
         {
-            if (IsFullyEncrypted($MountPoint))
+            if (IsFully-Encrypted($MountPoint))
             {
+                Write-Verbose "Drive encryption complete. Exiting."
                 break
             }
-            else {
+            else
+            {
+                Write-Verbose "Still encrypting..."
                 Start-Sleep $RetryIntervalSeconds
             }
         }
@@ -78,26 +99,29 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSeconds = 60,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 30
     )
 
-    #Load helper module
+    # Load helper module
     Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
-    return TestStatus($MountPoint)
+    Write-Verbose "About to check the status for drive."
+    return Test-Status($MountPoint)
 }
 
-function TestStatus([string] $unit)
+function Test-Status([Parameter()][string] $unit)
 {
     $encrypted = $true
 
@@ -115,7 +139,7 @@ function TestStatus([string] $unit)
     return $encrypted
 }
 
-function IsFullyEncrypted([string]$unit)
+function IsFully-Encrypted([Parameter()][string]$unit)
 {
     $status = Get-BitLockerVolume -MountPoint $unit
 

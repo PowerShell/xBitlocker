@@ -117,6 +117,14 @@ Defaults to false.
 
 *   AllowImmediateReboot:Whether the computer can rebooted immediately after initializing the TPM
 
+**xWaitForBLEncryption** adds the ability to wait for a unit to get fully encrypted. This allow you to
+make sure a full encryption happened before (depending on) going down the road on you DSC script.
+**xWaitForBLEncryption** has the following properties.
+
+*   *MountPoint:Drive letter to be checked for Encryption status and completeness.
+*   RetryIntervalSeconds:Indicates seconds to wait before checking back. Defaults to 60.
+*   RetryCount:Indicates how many times should retry before giving up. Defaults to 30.
+
 ## Versions
 
 ### Unreleased

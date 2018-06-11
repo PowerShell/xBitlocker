@@ -1,7 +1,7 @@
 [ClassVersion("1.0.0.0"), FriendlyName("xWaitForBLEncryption")]
 class MSFT_xWaitForBLEncryption : OMI_BaseResource
 {
-    [Key, Description("Drive letter")] String MountPoint;
-    [Write] UInt32 RetryIntervalSeconds;
-    [Write] UInt32 RetryCount;
+    [Key, Description("Drive letter to be checked for Encryption status and completeness")] String MountPoint;
+    [Write, Description("Indicates seconds to wait before checking back")] UInt32 RetryIntervalSeconds;
+    [Write, Description("Indicates how many times should retry before giving up")] UInt32 RetryCount;
 };
