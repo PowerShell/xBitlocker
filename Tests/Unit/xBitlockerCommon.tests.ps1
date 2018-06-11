@@ -138,9 +138,9 @@ try
                 }
 
                 It 'Should not generate any error messages' {
-                    Mock -CommandName Write-Error {}
+                    Mock -CommandName Write-Error
                     CheckForPreReqs
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 0 -Scope It
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 0 -Scope It
                 }
 
                 It 'Should run the CheckForPreReqs function without exceptions' {
@@ -168,9 +168,9 @@ try
                 }
 
                 It 'Should not generate any error messages' {
-                    Mock -CommandName Write-Error {}
+                    Mock -CommandName Write-Error
                     CheckForPreReqs
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 0 -Scope It
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 0 -Scope It
                 }
 
                 It 'Should run the CheckForPreReqs function without exceptions' {
@@ -191,25 +191,25 @@ try
                     }
                 }
 
-                Mock -CommandName Write-Error {}
+                Mock -CommandName Write-Error
 
                 It 'Should give an error that Bitlocker Windows Feature needs to be installed' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Message -eq 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
 
                 It 'Should give an error that RSAT-Feature-Tools-BitLocker Windows Feature needs to be installed' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Message -eq 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
 
                 It 'Should give an error that RSAT-Feature-Tools-BitLocker-RemoteAdminTool Windows Feature needs to be installed' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Message -eq 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
@@ -246,25 +246,25 @@ try
                     }
                 }
 
-                Mock -CommandName Write-Error {}
+                Mock -CommandName Write-Error
 
                 It 'Should give an error that Bitlocker Windows Feature needs to be installed' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Message -eq 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
 
                 It 'Should give an error that RSAT-Feature-Tools-BitLocker Windows Feature needs to be installed' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 1 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Message -eq 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
 
                 It 'Should not give an error that RSAT-Feature-Tools-BitLocker-RemoteAdminTool Windows Feature needs to be installed as this Windows Features is not available on Server Core.' {
                     {CheckForPreReqs} | Should -Throw
-                    Assert-MockCalled -Command Write-Error -Exactly -Time 0 -Scope It -ParameterFilter {
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 0 -Scope It -ParameterFilter {
                         $Message -eq 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
                     }
                 }
