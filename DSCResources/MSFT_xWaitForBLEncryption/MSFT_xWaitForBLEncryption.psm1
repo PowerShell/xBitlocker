@@ -33,15 +33,15 @@ function Get-TargetResource
 
     if ($status -ne $null)
     {
+        Write-Verbose "Status for drive available."
         $returnValue = @{
-            Write-Verbose "Status for drive available."
             Status = "$($MountPoint) drive ProtectionStatus is $($status.ProtectionStatus)."
         }
     }
     else
     {
+        Write-Verbose "Status for drive unavailable."
         $returnValue = @{
-            Write-Verbose "Status for drive unavailable."
             Status = "No information could be retrieved for specified drive."
         }
     }
