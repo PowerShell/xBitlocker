@@ -121,6 +121,9 @@ Defaults to false.
 
 ### Unreleased
 
+* Update appveyor.yml to use the default template.
+* Added default template files .gitattributes, and .vscode settings.
+
 ### 1.2.0.0
 
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
