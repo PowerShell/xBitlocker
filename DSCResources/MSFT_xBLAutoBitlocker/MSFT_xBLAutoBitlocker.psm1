@@ -5,7 +5,7 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("Fixed","Removable")]
         [System.String]
         $DriveType,
@@ -14,7 +14,7 @@ function Get-TargetResource
         $MinDiskCapacityGB,
 
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
 
@@ -89,7 +89,7 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("Fixed","Removable")]
         [System.String]
         $DriveType,
@@ -98,7 +98,7 @@ function Set-TargetResource
         $MinDiskCapacityGB,
 
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
 
@@ -193,7 +193,7 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("Fixed","Removable")]
         [System.String]
         $DriveType,
@@ -202,7 +202,7 @@ function Test-TargetResource
         $MinDiskCapacityGB,
 
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
 
@@ -298,7 +298,7 @@ function GetAutoBitlockerStatus
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("Fixed","Removable")]
         [System.String]
         $DriveType,
@@ -307,7 +307,7 @@ function GetAutoBitlockerStatus
         $MinDiskCapacityGB,
 
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
 

@@ -5,12 +5,12 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
 
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
 
@@ -70,7 +70,8 @@ function Get-TargetResource
         $UsedSpaceOnly
     )
 
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
@@ -87,12 +88,12 @@ function Set-TargetResource
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     param
-    (
+    ([Parameter(
         [parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
 
-        [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
+        [Parameter(t("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
         [parameter(Mandatory = $true)]
         [System.String]
         $PrimaryProtector,
@@ -153,7 +154,8 @@ function Set-TargetResource
         $UsedSpaceOnly
     )
 
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
@@ -165,12 +167,12 @@ function Test-TargetResource
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param
+    para[Parameter(
     (
         [parameter(Mandatory = $true)]
         [System.String]
         $MountPoint,
-
+[Parameter(
         [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
         [parameter(Mandatory = $true)]
         [System.String]
@@ -232,7 +234,8 @@ function Test-TargetResource
         $UsedSpaceOnly
     )
 
-    #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
+    #Load helper module
+    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
 
     CheckForPreReqs
 
