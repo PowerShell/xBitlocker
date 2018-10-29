@@ -374,7 +374,7 @@ function GetAutoBitlockerStatus
     }
 
     #Now find disks of the appropriate drive type, and add them to the collection
-    if ($null -eq $allBlvs)
+    if ($null -ne $allBlvs)
     {
         [Hashtable]$returnValue = @{}
 

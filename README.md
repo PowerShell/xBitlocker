@@ -1,4 +1,4 @@
-﻿# xBitlocker
+# xBitlocker
 
 The **xBitlocker** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources produced by the PowerShell Team.
 This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm** resources.
@@ -112,7 +112,7 @@ Defaults to false.
 **xBLTpm** has the following properties.
 
 *   *Identity:Not actually used, so could be anything
-*   AllowClear:Indicates that the provisioning process clears the TPM, if necessary, to move the TPM closer to complying with Windows Server® 2012 standards
+*   AllowClear:Indicates that the provisioning process clears the TPM, if necessary, to move the TPM closer to complying with Windows Server? 2012 standards
 *   AllowPhysicalPresence:Indicates that the provisioning process may send physical presence commands that require a user to be present in order to continue.
 
 *   AllowImmediateReboot:Whether the computer can rebooted immediately after initializing the TPM
