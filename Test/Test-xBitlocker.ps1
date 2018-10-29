@@ -1,7 +1,10 @@
+[CmdletBinding()]
+param()
+
 $showVerbose = $true
 $showValidSettings -eq $true
 
-if ($pin -eq $null)
+if ($null -eq $pin)
 {
     $pin = Get-Credential -Message "Enter the Bitlocker Pin in the password field"
 }
@@ -23,41 +26,6 @@ $blParams2 = @{
     StartupKeyPath = "A:"
     RecoveryPasswordProtector = $true
     UsedSpaceOnly = $true
-}
-
-$blParams3 = @{
-    MountPoint                = 'C:'
-    PrimaryProtector          = 'TpmProtector'
-    RecoveryPasswordProtector = $true
-    TpmProtector              = $true
-    UsedSpaceOnly             = $true
-}
-
-$blParams4 = @{
-    MountPoint                = 'C:'
-    PrimaryProtector          = 'TpmProtector'
-    Pin = $pin
-    TpmProtector              = $true
-    UsedSpaceOnly             = $true
-}
-
-$blParams5 = @{
-    MountPoint                = 'C:'
-    PrimaryProtector          = 'TpmProtector'
-    StartupKeyProtector = $true
-    StartupKeyPath = "E:"
-    TpmProtector              = $true
-    UsedSpaceOnly             = $true
-}
-
-$blParams6 = @{
-    MountPoint                = 'C:'
-    PrimaryProtector          = 'TpmProtector'
-    StartupKeyProtector = $true
-    StartupKeyPath = "E:"
-    Pin = $pin
-    TpmProtector              = $true
-    UsedSpaceOnly             = $true
 }
 
 $blParams7 = @{
@@ -107,7 +75,7 @@ function DisableBitlocker
 
     foreach ($v in $blv)
     {
-        if ($v.KeyProtector -ne $null -and $v.KeyProtector.Count -gt 0)
+        if ($null -ne $v.KeyProtector -and $v.KeyProtector.Count -gt 0)
         {
             $v | Disable-BitLocker | Out-Null
         }
@@ -119,13 +87,13 @@ function CheckSetting($testName, $expectedValue, $actualValue)
 {
     if ($expectedValue -ne $actualValue)
     {
-        Write-Host -ForegroundColor Red "Test: '$($testName)'. Result: Fail. Expected value: '$($expectedValue)'. Actual value: '$($actualValue)'."
+        Write-Error -Message "Test: '$($testName)'. Result: Fail. Expected value: '$($expectedValue)'. Actual value: '$($actualValue)'."
     }
     else
     {
         if ($showValidSettings -eq $true)
         {
-            Write-Host -ForegroundColor Green "Test: '$($testName)'. Result: Pass. Value: '$($expectedValue)'."
+            Write-Verbose -Message "Test: '$($testName)'. Result: Pass. Value: '$($expectedValue)'."
         }
     }
 }
@@ -151,7 +119,7 @@ function RunTest
         Set-TargetResource @Parameters -Verbose
 
         $getResult = Get-TargetResource @Parameters -Verbose
-        checkSetting -testName "$($TestName): Get" -expectedValue $true -actualValue ($getResult -ne $null)
+        checkSetting -testName "$($TestName): Get" -expectedValue $true -actualValue ($null -ne $getResult)
 
         $testResult = Test-TargetResource @Parameters -Verbose
         checkSetting -testName "$($TestName): Test" -expectedValue $true -actualValue $testResult
@@ -161,7 +129,7 @@ function RunTest
         Set-TargetResource @Parameters
 
         $getResult = Get-TargetResource @Parameters
-        checkSetting -testName "$($TestName): Get" -expectedValue $true -actualValue ($getResult -ne $null)
+        checkSetting -testName "$($TestName): Get" -expectedValue $true -actualValue ($null -ne $getResult)
 
         $testResult = Test-TargetResource @Parameters
         checkSetting -testName "$($TestName): Test" -expectedValue $true -actualValue $testResult
@@ -183,10 +151,6 @@ function RunTests
     {
         RunTest -TestName "TestBitlocker1" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams1
         RunTest -TestName "TestBitlocker2" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams2
-        #RunTest -TestName "TestBitlocker3" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams3
-        #RunTest -TestName "TestBitlocker4" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams4
-        #RunTest -TestName "TestBitlocker5" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams5
-        #RunTest -TestName "TestBitlocker6" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams6
         RunTest -TestName "TestBitlocker7" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams7
         RunTest -TestName "TestBitlocker8" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams8
         RunTest -TestName "TestBitlocker9" -ModulesToImport "MSFT_xBLBitlocker" -Parameters $blParams9

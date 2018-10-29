@@ -1,6 +1,13 @@
 #A common function used to enable Bitlocker on a disk.
 function EnableBitlocker
 {
+    # Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot.
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope='Function', Target='DSCMachineStatus')]
+    <#
+        Suppressing this rule because $global:DSCMachineStatus is only set,
+        never used (by design of Desired State Configuration).
+    #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Scope='Function', Target='DSCMachineStatus')]
     [CmdletBinding()]
     param
     (
@@ -75,7 +82,7 @@ function EnableBitlocker
 
     $blv = Get-BitLockerVolume -MountPoint $MountPoint -ErrorAction SilentlyContinue
 
-    if ($blv -ne $null)
+    if ($null -ne $blv)
     {
         if ($PSBoundParameters.ContainsKey("TpmProtector") -and $PrimaryProtector -ne "TpmProtector")
         {
@@ -211,7 +218,7 @@ function EnableBitlocker
             $newBlv = Enable-Bitlocker @params
 
             #Check if the Enable succeeded
-            if ($newBlv -ne $null)
+            if ($null -ne $newBlv)
             {
                 if ($blv.VolumeType -eq "OperatingSystem") #Only initiate reboot if this is an OS drive
                 {
@@ -320,7 +327,7 @@ function TestBitlocker
 
     $blv = Get-BitLockerVolume -MountPoint $MountPoint -ErrorAction SilentlyContinue
 
-    if ($blv -eq $null)
+    if ($null -eq $blv)
     {
         Write-Verbose "Unable to locate MountPoint: $($MountPoint)"
         return $false
@@ -330,7 +337,7 @@ function TestBitlocker
         Write-Verbose "MountPoint: $($MountPoint) Not Encrypted"
         return $false
     }
-    elseif ($blv.KeyProtector -eq $null -or $blv.KeyProtector.Count -eq 0)
+    elseif ($null -eq $blv.KeyProtector -or $blv.KeyProtector.Count -eq 0)
     {
         Write-Verbose "No key protectors on MountPoint: $($MountPoint)"
         return $false
@@ -443,7 +450,7 @@ function ContainsKeyProtector
 {
     param([string]$Type, $KeyProtectorCollection, [bool]$StartsWith = $false, [bool]$EndsWith = $false, [bool]$Contains = $false)
 
-    if ($KeyProtectorCollection -ne $null)
+    if ($null -ne $KeyProtectorCollection)
     {
         foreach ($keyProtector in $KeyProtectorCollection)
         {
@@ -494,7 +501,7 @@ function RemoveParameters
 {
     param($PSBoundParametersIn, [string[]]$ParamsToKeep, [string[]]$ParamsToRemove)
 
-    if ($ParamsToKeep -ne $null -and $ParamsToKeep.Count -gt 0)
+    if ($null -ne $ParamsToKeep -and $ParamsToKeep.Count -gt 0)
     {
         [string[]]$ParamsToRemove = @()
 
@@ -509,7 +516,7 @@ function RemoveParameters
         }
     }
 
-    if ($ParamsToRemove -ne $null -and $ParamsToRemove.Count -gt 0)
+    if ($null -ne $ParamsToRemove -and $ParamsToRemove.Count -gt 0)
     {
         foreach ($param in $ParamsToRemove)
         {

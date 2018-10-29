@@ -1,4 +1,4 @@
-# xBitlocker
+﻿# xBitlocker
 
 The **xBitlocker** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources produced by the PowerShell Team.
 This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm** resources.
@@ -123,6 +123,7 @@ Defaults to false.
 
 * Update appveyor.yml to use the default template.
 * Added default template files .gitattributes, and .vscode settings.
+* Fixes most PSScriptAnalyzer issues.
 
 ### 1.2.0.0
 

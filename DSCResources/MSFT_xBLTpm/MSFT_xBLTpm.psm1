@@ -1,5 +1,6 @@
 function Get-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -14,8 +15,8 @@ function Get-TargetResource
     CheckForPreReqs
 
     $tpm = Get-Tpm
-    
-    if ($tpm -ne $null)
+
+    if ($null -ne $tpm)
     {
         $returnValue = @{
             Identity = $Identity
@@ -28,6 +29,14 @@ function Get-TargetResource
 
 function Set-TargetResource
 {
+    # Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot.
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope='Function', Target='DSCMachineStatus')]
+    <#
+        Suppressing this rule because $global:DSCMachineStatus is only set,
+        never used (by design of Desired State Configuration).
+    #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Scope='Function', Target='DSCMachineStatus')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     param
     (
@@ -51,10 +60,10 @@ function Set-TargetResource
 
     $PSBoundParameters.Remove("Identity") | Out-Null
     $PSBoundParameters.Remove("AllowImmediateReboot") | Out-Null
-    
+
     $tpm = Initialize-Tpm @PSBoundParameters
 
-    if ($tpm -ne $null)
+    if ($null -ne $tpm)
     {
         if ($tpm.RestartRequired -eq $true)
         {
@@ -78,6 +87,7 @@ function Set-TargetResource
 
 function Test-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
@@ -102,7 +112,7 @@ function Test-TargetResource
 
     $tpm = Get-Tpm
 
-    if ($tpm -eq $null)
+    if ($null -eq $tpm)
     {
         return $false
     }

@@ -1,5 +1,6 @@
 function Get-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -76,13 +77,14 @@ function Get-TargetResource
     $returnValue = @{
         MountPoint = $MountPoint
     }
-    
+
     $returnValue
 }
 
 
 function Set-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     param
     (
@@ -152,7 +154,7 @@ function Set-TargetResource
     )
 
     #Load helper module    Import-Module "$((Get-Item -LiteralPath "$($PSScriptRoot)").Parent.Parent.FullName)\Misc\xBitlockerCommon.psm1" -Verbose:0
-      
+
     CheckForPreReqs
 
     EnableBitlocker @PSBoundParameters -VerbosePreference $VerbosePreference
@@ -160,6 +162,7 @@ function Set-TargetResource
 
 function Test-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
