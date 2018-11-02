@@ -1,4 +1,83 @@
-#A common function used to enable Bitlocker on a disk.
+<#
+    .SYNOPSIS
+        Enables Bitlocker and Bitlocker features on the requested disk.
+
+    .PARAMETER MountPoint
+        The MountPoint name as reported in Get-BitLockerVolume.
+
+    .PARAMETER PrimaryProtector
+        The type of key protector that will be used as the primary key
+        protector.
+
+    .PARAMETER AdAccountOrGroup
+        Specifies an account using the format Domain\User.
+
+    .PARAMETER AdAccountOrGroupProtector
+        Indicates that BitLocker uses an AD DS account as a protector for the
+        volume encryption key.
+
+    .PARAMETER AllowImmediateReboot
+        Whether the computer can be immediately rebooted after enabling
+        Bitlocker on an OS drive. Defaults to false.
+
+    .PARAMETER AutoUnlock
+        Whether volumes should be enabled for auto unlock using
+        Enable-BitlockerAutoUnlock.
+
+    .PARAMETER EncryptionMethod
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER HardwareEncryption
+        Indicates that the volume uses hardware encryption.
+
+    .PARAMETER Password
+        Specifies a secure string object that contains a password.
+
+    .PARAMETER PasswordProtector
+        Indicates that BitLocker uses a password as a protector for the volume
+        encryption key.
+
+    .PARAMETER Pin
+        Specifies a secure string object that contains a PIN.
+
+    .PARAMETER RecoveryKeyPath
+        Specifies a path to a recovery key.
+
+    .PARAMETER RecoveryKeyProtector
+        Indicates that BitLocker uses a recovery key as a protector for the
+        volume encryption key.
+
+    .PARAMETER RecoveryPasswordProtector
+        Indicates that BitLocker uses a recovery password as a protector for
+        the volume encryption key.
+
+    .PARAMETER Service
+        Indicates that the system account for this computer unlocks the
+        encrypted volume.
+
+    .PARAMETER SkipHardwareTest
+        Indicates that BitLocker does not perform a hardware test before it
+        begins encryption.
+
+    .PARAMETER StartupKeyPath
+        Specifies a path to a startup key.
+
+    .PARAMETER StartupKeyProtector
+        Indicates that BitLocker uses a startup key as a protector for the
+        volume encryption key.
+
+    .PARAMETER TpmProtector
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER UsedSpaceOnly
+        Indicates that BitLocker does not encrypt disk space which contains
+        unused data.
+
+    .PARAMETER VerbosePreference
+        Used to modify the default VerbosePreference for the function.
+#>
 function EnableBitlocker
 {
     [CmdletBinding()]
@@ -87,41 +166,7 @@ function EnableBitlocker
             throw "A TpmProtector must be used if Pin is used."
         }
 
-        if ($PSBoundParameters.ContainsKey("AdAccountOrGroupProtector") -and $PrimaryProtector -notlike "AdAccountOrGroupProtector" -and !(ContainsKeyProtector -Type "AdAccountOrGroup" -KeyProtectorCollection $blv.KeyProtector))
-        {
-            Write-Verbose "Adding AdAccountOrGroupProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -AdAccountOrGroupProtector -AdAccountOrGroup $AdAccountOrGroup
-        }
-
-        if ($PSBoundParameters.ContainsKey("PasswordProtector") -and $PrimaryProtector -notlike "PasswordProtector" -and !(ContainsKeyProtector -Type "Password" -KeyProtectorCollection $blv.KeyProtector))
-        {
-            Write-Verbose "Adding PasswordProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -PasswordProtector -Password $Password.Password
-        }
-
-        if ($PSBoundParameters.ContainsKey("RecoveryKeyProtector") -and $PrimaryProtector -notlike "RecoveryKeyProtector" -and !(ContainsKeyProtector -Type "ExternalKey" -KeyProtectorCollection $blv.KeyProtector))
-        {
-            Write-Verbose "Adding RecoveryKeyProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -RecoveryKeyProtector -RecoveryKeyPath $RecoveryKeyPath
-        }
-
-        if ($PSBoundParameters.ContainsKey("RecoveryPasswordProtector") -and $PrimaryProtector -notlike "RecoveryPasswordProtector" -and !(ContainsKeyProtector -Type "RecoveryPassword" -KeyProtectorCollection $blv.KeyProtector))
-        {
-            Write-Verbose "Adding RecoveryPasswordProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -RecoveryPasswordProtector
-        }
-
-        if ($PSBoundParameters.ContainsKey("StartupKeyProtector") -and $PrimaryProtector -notlike "TpmProtector" -and $PrimaryProtector -notlike "StartupKeyProtector" -and !(ContainsKeyProtector -Type "ExternalKey" -KeyProtectorCollection $blv.KeyProtector))
-        {
-            Write-Verbose "Adding StartupKeyProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -StartupKeyProtector -StartupKeyPath $StartupKeyPath
-        }
-
-        if ($PSBoundParameters.ContainsKey("TpmProtector") -and $PrimaryProtector -notlike "TpmProtector" -and !(ContainsKeyProtector -Type "Tpm" -KeyProtectorCollection $blv.KeyProtector -StartsWith $true))
-        {
-            Write-Verbose "Adding TpmProtector"
-            Add-BitLockerKeyProtector -MountPoint $MountPoint -TpmProtector $TpmProtector
-        }
+        Add-MissingBitLockerKeyProtector @PSBoundParameters -Verbose:$VerbosePreference
 
         #Now enable Bitlocker with the primary key protector
         if ($blv.VolumeStatus -eq "FullyDecrypted")
@@ -208,10 +253,10 @@ function EnableBitlocker
             #Run Enable-Bitlocker
             Write-Verbose "Running Enable-Bitlocker"
 
-            $newBlv = Enable-Bitlocker @params
+            $blv = Enable-Bitlocker @params
 
             #Check if the Enable succeeded
-            if ($newBlv -ne $null)
+            if ($blv -ne $null)
             {
                 if ($blv.VolumeType -eq "OperatingSystem") #Only initiate reboot if this is an OS drive
                 {
@@ -230,12 +275,12 @@ function EnableBitlocker
             {
                 throw "Failed to successfully enable Bitlocker on MountPoint $($MountPoint)"
             }
+        }
 
-            #Finally, enable AutoUnlock if requested
-            if ($AutoUnlock -eq $true -and $blv.VolumeType -ne "OperatingSystem")
-            {
-                Enable-BitlockerAutoUnlock -MountPoint $MountPoint
-            }
+        # Finally, enable AutoUnlock if requested
+        if ($AutoUnlock -eq $true -and $blv.VolumeType -ne 'OperatingSystem' -and !$blv.AutoUnlockEnabled)
+        {
+            Enable-BitlockerAutoUnlock -MountPoint $MountPoint
         }
     }
     else
@@ -244,7 +289,290 @@ function EnableBitlocker
     }
 }
 
-#A common function used to test if Bitlocker is enabled on a disk with the appropriate settings
+<#
+    .SYNOPSIS
+        Checks if any required secondary Key Protectors are missing, and adds
+        them to the requested volume.
+
+    .PARAMETER MountPoint
+        The MountPoint name as reported in Get-BitLockerVolume.
+
+    .PARAMETER PrimaryProtector
+        The type of key protector that will be used as the primary key
+        protector.
+
+    .PARAMETER AdAccountOrGroup
+        Specifies an account using the format Domain\User.
+
+    .PARAMETER AdAccountOrGroupProtector
+        Indicates that BitLocker uses an AD DS account as a protector for the
+        volume encryption key.
+
+    .PARAMETER AllowImmediateReboot
+        Whether the computer can be immediately rebooted after enabling
+        Bitlocker on an OS drive. Defaults to false.
+
+    .PARAMETER AutoUnlock
+        Whether volumes should be enabled for auto unlock using
+        Enable-BitlockerAutoUnlock.
+
+    .PARAMETER EncryptionMethod
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER HardwareEncryption
+        Indicates that the volume uses hardware encryption.
+
+    .PARAMETER Password
+        Specifies a secure string object that contains a password.
+
+    .PARAMETER PasswordProtector
+        Indicates that BitLocker uses a password as a protector for the volume
+        encryption key.
+
+    .PARAMETER Pin
+        Specifies a secure string object that contains a PIN.
+
+    .PARAMETER RecoveryKeyPath
+        Specifies a path to a recovery key.
+
+    .PARAMETER RecoveryKeyProtector
+        Indicates that BitLocker uses a recovery key as a protector for the
+        volume encryption key.
+
+    .PARAMETER RecoveryPasswordProtector
+        Indicates that BitLocker uses a recovery password as a protector for
+        the volume encryption key.
+
+    .PARAMETER Service
+        Indicates that the system account for this computer unlocks the
+        encrypted volume.
+
+    .PARAMETER SkipHardwareTest
+        Indicates that BitLocker does not perform a hardware test before it
+        begins encryption.
+
+    .PARAMETER StartupKeyPath
+        Specifies a path to a startup key.
+
+    .PARAMETER StartupKeyProtector
+        Indicates that BitLocker uses a startup key as a protector for the
+        volume encryption key.
+
+    .PARAMETER TpmProtector
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER UsedSpaceOnly
+        Indicates that BitLocker does not encrypt disk space which contains
+        unused data.
+
+    .PARAMETER VerbosePreference
+        Used to modify the default VerbosePreference for the function.
+#>
+function Add-MissingBitLockerKeyProtector
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $MountPoint,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("PasswordProtector","RecoveryPasswordProtector","StartupKeyProtector","TpmProtector")]
+        [System.String]
+        $PrimaryProtector,
+
+        [Parameter()]
+        [System.String]
+        $AdAccountOrGroup,
+
+        [Parameter()]
+        [System.Boolean]
+        $AdAccountOrGroupProtector,
+
+        [Parameter()]
+        [System.Boolean]
+        $AllowImmediateReboot = $false,
+
+        [Parameter()]
+        [System.Boolean]
+        $AutoUnlock = $false,
+
+        [Parameter()]
+        [ValidateSet("Aes128","Aes256")]
+        [System.String]
+        $EncryptionMethod,
+
+        [Parameter()]
+        [System.Boolean]
+        $HardwareEncryption,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Password,
+
+        [Parameter()]
+        [System.Boolean]
+        $PasswordProtector,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Pin,
+
+        [Parameter()]
+        [System.String]
+        $RecoveryKeyPath,
+
+        [Parameter()]
+        [System.Boolean]
+        $RecoveryKeyProtector,
+
+        [Parameter()]
+        [System.Boolean]
+        $RecoveryPasswordProtector,
+
+        [Parameter()]
+        [System.Boolean]
+        $Service,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipHardwareTest,
+
+        [Parameter()]
+        [System.String]
+        $StartupKeyPath,
+
+        [Parameter()]
+        [System.Boolean]
+        $StartupKeyProtector,
+
+        [Parameter()]
+        [System.Boolean]
+        $TpmProtector,
+
+        [Parameter()]
+        [System.Boolean]
+        $UsedSpaceOnly,
+
+        [Parameter()]
+        $VerbosePreference
+    )
+
+    if ($PSBoundParameters.ContainsKey("AdAccountOrGroupProtector") -and $PrimaryProtector -notlike "AdAccountOrGroupProtector" -and !(ContainsKeyProtector -Type "AdAccountOrGroup" -KeyProtectorCollection $blv.KeyProtector))
+    {
+        Write-Verbose "Adding AdAccountOrGroupProtector"
+        Add-BitLockerKeyProtector -MountPoint $MountPoint -AdAccountOrGroupProtector -AdAccountOrGroup $AdAccountOrGroup
+    }
+
+    if ($PSBoundParameters.ContainsKey("PasswordProtector") -and $PrimaryProtector -notlike "PasswordProtector" -and !(ContainsKeyProtector -Type "Password" -KeyProtectorCollection $blv.KeyProtector))
+    {
+        Write-Verbose "Adding PasswordProtector"
+        Add-BitLockerKeyProtector -MountPoint $MountPoint -PasswordProtector -Password $Password.Password
+    }
+
+    if ($PSBoundParameters.ContainsKey("RecoveryKeyProtector") -and $PrimaryProtector -notlike "RecoveryKeyProtector" -and !(ContainsKeyProtector -Type "ExternalKey" -KeyProtectorCollection $blv.KeyProtector))
+    {
+        Write-Verbose "Adding RecoveryKeyProtector"
+        Add-BitLockerKeyProtector -MountPoint $MountPoint -RecoveryKeyProtector -RecoveryKeyPath $RecoveryKeyPath
+    }
+
+    if ($PSBoundParameters.ContainsKey("RecoveryPasswordProtector") -and $PrimaryProtector -notlike "RecoveryPasswordProtector" -and !(ContainsKeyProtector -Type "RecoveryPassword" -KeyProtectorCollection $blv.KeyProtector))
+    {
+        Write-Verbose "Adding RecoveryPasswordProtector"
+        Add-BitLockerKeyProtector -MountPoint $MountPoint -RecoveryPasswordProtector
+    }
+
+    if ($PSBoundParameters.ContainsKey("StartupKeyProtector") -and $PrimaryProtector -notlike "TpmProtector" -and $PrimaryProtector -notlike "StartupKeyProtector" -and !(ContainsKeyProtector -Type "ExternalKey" -KeyProtectorCollection $blv.KeyProtector))
+    {
+        Write-Verbose "Adding StartupKeyProtector"
+        Add-BitLockerKeyProtector -MountPoint $MountPoint -StartupKeyProtector -StartupKeyPath $StartupKeyPath
+    }
+}
+
+<#
+    .SYNOPSIS
+        Tests whether Bitlocker and the requested features have been enabled
+        on the target disk.
+
+    .PARAMETER MountPoint
+        The MountPoint name as reported in Get-BitLockerVolume.
+
+    .PARAMETER PrimaryProtector
+        The type of key protector that will be used as the primary key
+        protector.
+
+    .PARAMETER AdAccountOrGroup
+        Specifies an account using the format Domain\User.
+
+    .PARAMETER AdAccountOrGroupProtector
+        Indicates that BitLocker uses an AD DS account as a protector for the
+        volume encryption key.
+
+    .PARAMETER AllowImmediateReboot
+        Whether the computer can be immediately rebooted after enabling
+        Bitlocker on an OS drive. Defaults to false.
+
+    .PARAMETER AutoUnlock
+        Whether volumes should be enabled for auto unlock using
+        Enable-BitlockerAutoUnlock.
+
+    .PARAMETER EncryptionMethod
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER HardwareEncryption
+        Indicates that the volume uses hardware encryption.
+
+    .PARAMETER Password
+        Specifies a secure string object that contains a password.
+
+    .PARAMETER PasswordProtector
+        Indicates that BitLocker uses a password as a protector for the volume
+        encryption key.
+
+    .PARAMETER Pin
+        Specifies a secure string object that contains a PIN.
+
+    .PARAMETER RecoveryKeyPath
+        Specifies a path to a recovery key.
+
+    .PARAMETER RecoveryKeyProtector
+        Indicates that BitLocker uses a recovery key as a protector for the
+        volume encryption key.
+
+    .PARAMETER RecoveryPasswordProtector
+        Indicates that BitLocker uses a recovery password as a protector for
+        the volume encryption key.
+
+    .PARAMETER Service
+        Indicates that the system account for this computer unlocks the
+        encrypted volume.
+
+    .PARAMETER SkipHardwareTest
+        Indicates that BitLocker does not perform a hardware test before it
+        begins encryption.
+
+    .PARAMETER StartupKeyPath
+        Specifies a path to a startup key.
+
+    .PARAMETER StartupKeyProtector
+        Indicates that BitLocker uses a startup key as a protector for the
+        volume encryption key.
+
+    .PARAMETER TpmProtector
+        Indicates that BitLocker uses the TPM as a protector for the volume
+        encryption key.
+
+    .PARAMETER UsedSpaceOnly
+        Indicates that BitLocker does not encrypt disk space which contains
+        unused data.
+
+    .PARAMETER VerbosePreference
+        Used to modify the default VerbosePreference for the function.
+#>
 function TestBitlocker
 {
     [CmdletBinding()]
@@ -335,7 +663,7 @@ function TestBitlocker
         Write-Verbose "No key protectors on MountPoint: $($MountPoint)"
         return $false
     }
-    elseif ($AutoUnlock -eq $true -and $blv.AutoUnlockEnabled -ne $true)
+    elseif ($AutoUnlock -eq $true -and $blv.AutoUnlockEnabled -ne $true -and $blv.VolumeType -ne 'OperatingSystem')
     {
         Write-Verbose "AutoUnlock is not enabled for MountPoint: $($MountPoint)"
         return $false
@@ -441,7 +769,7 @@ function CheckForPreReqs
 #Checks whether the KeyProtectorCollection returned from Get-BitlockerVolume contains the specified key protector type
 function ContainsKeyProtector
 {
-    param([string]$Type, $KeyProtectorCollection, [bool]$StartsWith = $false, [bool]$EndsWith = $false, [bool]$Contains = $false)
+    param([string]$Type, $KeyProtectorCollection, [bool]$StartsWith = $false, [bool]$Contains = $false)
 
     if ($KeyProtectorCollection -ne $null)
     {
@@ -455,10 +783,6 @@ function ContainsKeyProtector
             {
                 return $true
             }
-            elseif ($EndsWith -eq $true -and $keyProtector.KeyProtectorType.ToString().EndsWith($Type))
-            {
-                return $true
-            }
             elseif ($Contains -eq $true -and $keyProtector.KeyProtectorType.ToString().Contains($Type))
             {
                 return $true
@@ -469,10 +793,30 @@ function ContainsKeyProtector
     return $false
 }
 
-#Takes $PSBoundParameters from another function and adds in the keys and values from the given Hashtable
+<#
+    .SYNOPSIS
+        Takes $PSBoundParameters from another function and adds in the keys and
+        values from the given Hashtable.
+
+    .PARAMETER PSBoundParametersIn
+        The $PSBoundParameters Hashtable from the calling function.
+
+    .PARAMETER ParamsToAdd
+        A Hashtable containing new Key/Value pairs to add to the given
+        PSBoundParametersIn Hashtable.
+#>
 function AddParameters
 {
-    param($PSBoundParametersIn, [Hashtable]$ParamsToAdd)
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        $PSBoundParametersIn,
+
+        [Parameter()]
+        [System.Collections.Hashtable]
+        $ParamsToAdd
+    )
 
     foreach ($key in $ParamsToAdd.Keys)
     {
@@ -487,18 +831,53 @@ function AddParameters
     }
 }
 
-#Takes $PSBoundParameters from another function. If ParamsToRemove is specified, it will remove each param.
-#If ParamsToKeep is specified, everything but those params will be removed. If both ParamsToRemove and ParamsToKeep
-#are specified, only ParamsToKeep will be used.
+<#
+    .SYNOPSIS
+        Takes $PSBoundParameters from another function, and modifies it based
+        on the contents of the ParamsToRemove or ParamsToKeep parameters. If
+        ParamsToRemove is specified, it will remove each param. If ParamsToKeep
+        is specified, everything but those params will be removed. If both
+        ParamsToRemove and ParamsToKeep are specified, the function will throw
+        an exception.
+
+    .PARAMETER PSBoundParametersIn
+        The $PSBoundParameters Hashtable from the calling function.
+
+    .PARAMETER ParamsToKeep
+        A String array containing the list of parameter names to keep in the
+        given PSBoundParametersIn HashTable.
+
+    .PARAMETER ParamsToRemove
+        A String array containing the list of parameter names to remove in the
+        given PSBoundParametersIn HashTable.
+#>
 function RemoveParameters
 {
-    param($PSBoundParametersIn, [string[]]$ParamsToKeep, [string[]]$ParamsToRemove)
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        $PSBoundParametersIn,
 
-    if ($ParamsToKeep -ne $null -and $ParamsToKeep.Count -gt 0)
+        [Parameter()]
+        [System.String[]]
+        $ParamsToKeep,
+
+        [Parameter()]
+        [System.String[]]
+        $ParamsToRemove
+    )
+
+    if ($ParamsToKeep.Count -gt 0 -and $ParamsToRemove.Count -gt 0)
     {
-        [string[]]$ParamsToRemove = @()
+        throw 'Remove-FromPSBoundParametersUsingHashtable does not support using both ParamsToKeep and ParamsToRemove'
+    }
 
-        $lowerParamsToKeep = StringArrayToLower -Array $ParamsToKeep
+    if ($ParamsToKeep.Count -gt 0)
+    {
+        $ParamsToKeep = $ParamsToKeep.ToLower()
+
+        $lowerParamsToKeep = Convert-StringArrayToLowerCase -Array $ParamsToKeep
 
         foreach ($key in $PSBoundParametersIn.Keys)
         {
@@ -509,13 +888,42 @@ function RemoveParameters
         }
     }
 
-    if ($ParamsToRemove -ne $null -and $ParamsToRemove.Count -gt 0)
+    if ($ParamsToRemove.Count -gt 0)
     {
         foreach ($param in $ParamsToRemove)
         {
             $PSBoundParametersIn.Remove($param) | Out-Null
         }
     }
+}
+
+<#
+    .SYNOPSIS
+        Takes an array of strings and converts each element in the array to
+        all lowercase characters.
+
+    .PARAMETER Array
+        The array of System.String objects to convert into lowercase strings.
+#>
+function Convert-StringArrayToLowerCase
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $Array
+    )
+
+    [System.String[]] $arrayOut = New-Object -TypeName 'System.String[]' -ArgumentList $Array.Count
+
+    for ($i = 0; $i -lt $Array.Count; $i++)
+    {
+        $arrayOut[$i] = $Array[$i].ToLower()
+    }
+
+    return $arrayOut
 }
 
 <#
