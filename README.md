@@ -112,7 +112,7 @@ Defaults to false.
 **xBLTpm** has the following properties.
 
 *   *Identity:Not actually used, so could be anything
-*   AllowClear:Indicates that the provisioning process clears the TPM, if necessary, to move the TPM closer to complying with Windows Server® 2012 standards
+*   AllowClear:Indicates that the provisioning process clears the TPM, if necessary, to move the TPM closer to complying with Windows Server? 2012 standards
 *   AllowPhysicalPresence:Indicates that the provisioning process may send physical presence commands that require a user to be present in order to continue.
 
 *   AllowImmediateReboot:Whether the computer can rebooted immediately after initializing the TPM
@@ -123,6 +123,7 @@ Defaults to false.
 
 * Update appveyor.yml to use the default template.
 * Added default template files .gitattributes, and .vscode settings.
+* Add Unit tests for MSFT_xBLTpm
 
 ### 1.2.0.0
 

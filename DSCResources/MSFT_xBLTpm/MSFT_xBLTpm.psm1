@@ -49,8 +49,8 @@ function Set-TargetResource
 
     CheckForPreReqs
 
-    $PSBoundParameters.Remove("Identity") | Out-Null
-    $PSBoundParameters.Remove("AllowImmediateReboot") | Out-Null
+    $PSBoundParameters.Remove('Identity') | Out-Null
+    $PSBoundParameters.Remove('AllowImmediateReboot') | Out-Null
     
     $tpm = Initialize-Tpm @PSBoundParameters
 
@@ -62,7 +62,7 @@ function Set-TargetResource
 
             if ($AllowImmediateReboot -eq $true)
             {
-                Write-Verbose "Forcing an immediate reboot of the computer in 30 seconds"
+                Write-Verbose 'Forcing an immediate reboot of the computer in 30 seconds'
 
                 Start-Sleep -Seconds 30
                 Restart-Computer -Force
@@ -71,7 +71,7 @@ function Set-TargetResource
     }
     else
     {
-        throw "Failed to initialize TPM"
+        throw 'Failed to initialize TPM'
     }
 }
 
@@ -104,6 +104,8 @@ function Test-TargetResource
 
     if ($tpm -eq $null)
     {
+        Write-Error -Message 'Failed to retrieve TPM information'
+
         return $false
     }
     else
