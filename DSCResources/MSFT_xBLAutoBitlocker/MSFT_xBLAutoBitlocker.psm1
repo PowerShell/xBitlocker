@@ -162,7 +162,7 @@ function Set-TargetResource
 
     if ($autoBlVols -eq $null)
     {
-        throw "No Auto Bitlocker volumes were found"
+        throw 'No Auto Bitlocker volumes were found'
     }
     else
     {
@@ -263,9 +263,13 @@ function Test-TargetResource
 
     $autoBlVols = GetAutoBitlockerStatus @PSBoundParameters
 
+    $allEnabled = $true
+
     if ($autoBlVols -eq $null)
     {
-        return $false
+        Write-Error -Message 'Failed to retrieve Bitlocker status'
+
+        $allEnabled = $false
     }
     else
     {
@@ -281,12 +285,14 @@ function Test-TargetResource
 
             if ($testResult -eq $false)
             {
-                return $testResult
+                Write-Verbose -Message "Volume with Key '$key' is not yet enabled for Bitlocker"
+
+                $allEnabled = $false
             }
         }
     }
 
-    return $true
+    return $allEnabled
 }
 
 function GetAutoBitlockerStatus
