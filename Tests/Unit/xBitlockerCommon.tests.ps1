@@ -730,35 +730,6 @@ try
             }
         }
 
-        <#
-        Describe 'xBitLockerCommon\TestBitlocker' -Tag 'Helper' {
-            # Override Bitlocker cmdlets
-            function Get-BitLockerVolume {}
-
-            $mountPoint = 'C:'
-
-            Context 'When TestBitlocker is called and Get-BitlockerVolume returns null' {
-                It 'Should return False' {
-                    Mock -CommandName Get-BitLockerVolume -Verifiable
-
-                    TestBitlocker -MountPoint $mountPoint -PrimaryProtector 'TpmProtector' | Should -Be $false
-                }   
-            }
-
-            Context 'When TestBitlocker is called and the VolumeStatus is FullyDecrypted' {
-                It 'Should return False' {
-                    Mock -CommandName Get-BitLockerVolume -Verifiable -MockWith {
-                        return @{
-                            VolumeStatus = 'FullyDecrypted'
-                        }
-                    }
-
-                    TestBitlocker -MountPoint $mountPoint -PrimaryProtector 'TpmProtector' | Should -Be $false
-                }   
-            }
-        }
-        #>
-
         Describe 'xBitLockerCommon\ContainsKeyProtector' -Tag 'Helper' {
             $testKeyProtectorCollection = @(
                 @{
@@ -873,14 +844,12 @@ try
             Context 'When RemoveParameters is called and both ParamsToKeep and ParamsToRemove are specified' {
                 It 'Should throw an exception' {
                     { RemoveParameters -PSBoundParametersIn @{} -ParamsToKeep @('Param1') -ParamsToRemove @('Param2') } | `
-                        Should -Throw -ExpectedMessage 'Remove-FromPSBoundParametersUsingHashtable does not support using both ParamsToKeep and ParamsToRemove'
+                        Should -Throw -ExpectedMessage 'Parameter set cannot be resolved using the specified named parameters.'
                 }
             }
 
             Context 'When RemoveParameters is called with ParamsToKeep' {
                 It 'Should remove any parameter not specified in ParamsToKeep' {
-                    Mock -CommandName Convert-StringArrayToLowerCase -Verifiable -MockWith { return @('param1', 'param2') }
-
                     $psBoundParametersIn = @{
                         Param1 = 1
                         Param2 = 2

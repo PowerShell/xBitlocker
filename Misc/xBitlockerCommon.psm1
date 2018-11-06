@@ -811,6 +811,7 @@ function AddParameters
     param
     (
         [Parameter(Mandatory = $true)]
+        [System.Object]
         $PSBoundParametersIn,
 
         [Parameter()]
@@ -836,9 +837,7 @@ function AddParameters
         Takes $PSBoundParameters from another function, and modifies it based
         on the contents of the ParamsToRemove or ParamsToKeep parameters. If
         ParamsToRemove is specified, it will remove each param. If ParamsToKeep
-        is specified, everything but those params will be removed. If both
-        ParamsToRemove and ParamsToKeep are specified, the function will throw
-        an exception.
+        is specified, everything but those params will be removed.
 
     .PARAMETER PSBoundParametersIn
         The $PSBoundParameters Hashtable from the calling function.
@@ -857,31 +856,25 @@ function RemoveParameters
     param
     (
         [Parameter(Mandatory = $true)]
+        [System.Object]
         $PSBoundParametersIn,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName = 'KeepParameters')]
         [System.String[]]
         $ParamsToKeep,
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName = 'RemoveParameters')]
         [System.String[]]
         $ParamsToRemove
     )
-
-    if ($ParamsToKeep.Count -gt 0 -and $ParamsToRemove.Count -gt 0)
-    {
-        throw 'Remove-FromPSBoundParametersUsingHashtable does not support using both ParamsToKeep and ParamsToRemove'
-    }
 
     if ($ParamsToKeep.Count -gt 0)
     {
         $ParamsToKeep = $ParamsToKeep.ToLower()
 
-        $lowerParamsToKeep = Convert-StringArrayToLowerCase -Array $ParamsToKeep
-
         foreach ($key in $PSBoundParametersIn.Keys)
         {
-            if (!($lowerParamsToKeep.Contains($key.ToLower())))
+            if (!($ParamsToKeep.Contains($key.ToLower())))
             {
                 $ParamsToRemove += $key
             }
@@ -892,38 +885,9 @@ function RemoveParameters
     {
         foreach ($param in $ParamsToRemove)
         {
-            $PSBoundParametersIn.Remove($param) | Out-Null
+            $null = $PSBoundParametersIn.Remove($param)
         }
     }
-}
-
-<#
-    .SYNOPSIS
-        Takes an array of strings and converts each element in the array to
-        all lowercase characters.
-
-    .PARAMETER Array
-        The array of System.String objects to convert into lowercase strings.
-#>
-function Convert-StringArrayToLowerCase
-{
-    [CmdletBinding()]
-    [OutputType([System.String[]])]
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $Array
-    )
-
-    [System.String[]] $arrayOut = New-Object -TypeName 'System.String[]' -ArgumentList $Array.Count
-
-    for ($i = 0; $i -lt $Array.Count; $i++)
-    {
-        $arrayOut[$i] = $Array[$i].ToLower()
-    }
-
-    return $arrayOut
 }
 
 <#
