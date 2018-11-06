@@ -782,26 +782,6 @@ try
             }
         }
 
-        Describe 'xBitLockerCommon\Convert-StringArrayToLowerCase' -Tag 'Helper' {
-            Context 'When Convert-StringArrayToLowerCase is called' {
-                It 'All input array members show be converted to lower case, and null members should be converted to empty strings' {
-                    [System.String[]] $inputArray = @('ABC', 'dEf', $null, 'GhI', 'jkl', '', 'mnO')
-
-                    $outputArray = Convert-StringArrayToLowerCase -Array $inputArray
-
-                    $outputArray.Count | Should -Be 7
-                    $outputArray.Contains('abc') | Should -Be $true
-                    $outputArray.Contains('def') | Should -Be $true
-                    $outputArray.Contains('ghi') | Should -Be $true
-                    $outputArray.Contains('jkl') | Should -Be $true
-                    $outputArray.Contains('mno') | Should -Be $true
-
-                    $outputArray[2] | Should -Be ''
-                    $outputArray[5] | Should -Be ''
-                }
-            }
-        }
-
         Describe 'xBitLockerCommon\AddParameters' -Tag 'Helper' {
             AfterEach {
                 Assert-VerifiableMock
