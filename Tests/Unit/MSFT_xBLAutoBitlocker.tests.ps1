@@ -67,7 +67,6 @@ try
                     $getResult = Get-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector
                     $getResult | Should -Be -Not $null
                     $getResult.DriveType | Should -Be $testDriveType
-
                 }
             }
         }
