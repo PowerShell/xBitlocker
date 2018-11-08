@@ -200,7 +200,7 @@ function Set-TargetResource
 
     if ($null -eq $autoBlVols)
     {
-        throw "No Auto Bitlocker volumes were found"
+        throw 'No Auto Bitlocker volumes were found'
     }
     else
     {
@@ -320,9 +320,13 @@ function Test-TargetResource
 
     $autoBlVols = GetAutoBitlockerStatus @PSBoundParameters
 
+    $allEnabled = $true
+
     if ($null -eq $autoBlVols)
     {
-        return $false
+        Write-Error -Message 'Failed to retrieve Bitlocker status'
+
+        $allEnabled = $false
     }
     else
     {
@@ -338,12 +342,14 @@ function Test-TargetResource
 
             if ($testResult -eq $false)
             {
-                return $testResult
+                Write-Verbose -Message "Volume with Key '$key' is not yet enabled for Bitlocker"
+
+                $allEnabled = $false
             }
         }
     }
 
-    return $true
+    return $allEnabled
 }
 
 function GetAutoBitlockerStatus
@@ -437,7 +443,7 @@ function GetAutoBitlockerStatus
     )
 
     #First get all Bitlocker Volumes of type Data
-    $allBlvs = Get-BitLockerVolume | Where-Object -FilterScript {$_.VolumeType -eq "Data"}
+    $allBlvs = Get-BitLockerVolume | Where-Object -FilterScript {$_.VolumeType -eq 'Data'}
 
     #Filter on size if it was specified
     if ($PSBoundParameters.ContainsKey("MinDiskCapacityGB"))

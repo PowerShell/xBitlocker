@@ -1,23 +1,32 @@
 #region HEADER
+$script:DSCModuleName = 'xBitlocker'
+$script:DSCResourceName = 'MSFT_xBLAutoBitlocker'
 
-# Unit Test Template Version: 1.2.1
+# Unit Test Template Version: 1.2.4
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName 'xBitlocker' `
-    -DSCResourceName 'MSFT_xBLAutoBitlocker' `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 
 #endregion HEADER
 
-function Invoke-TestCleanup {
+function Invoke-TestSetup
+{
+
+}
+
+function Invoke-TestCleanup
+{
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 }
 
@@ -25,7 +34,7 @@ function Invoke-TestCleanup {
 try
 {
     InModuleScope 'MSFT_xBLAutoBitlocker' {
-
+        # Override Bitlocker functions
         function Get-BitLockerVolume {
             param
             (
@@ -35,206 +44,338 @@ try
             )
         }
 
-        # Get-BitlockerVolume is used to obtain list of volumes in the system and their current encryption status
-        Mock `
-            -CommandName Get-BitlockerVolume `
-            -ModuleName 'MSFT_xBLAutoBitlocker' `
-            -MockWith {
-                # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
-                return @(
-                    @{
-                        # C: is OS drive
-                        VolumeType = 'OperatingSystem'
-                        MountPoint = 'C:'
-                        CapacityGB = 500
-                        VolumeStatus = 'FullyEncrypted'
-                        EncryptionPercentage = 100
-                        KeyProtector = @(
-                            @{
-                                KeyProtectorType = 'Tpm'
-                            },
-                            @{
-                                KeyProtectorType = 'RecoveryPassword'
-                            }
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'On'
-                    },
-                    @{
-                        # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = 'D:'
-                        CapacityGB = 500
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    },
-                    @{
-                        # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = 'E:'
-                        CapacityGB = 50
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    }
-                    @{
-                        # F: is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = 'F:'
-                        CapacityGB = 500
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    },
-                    @{
-                        # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
-                        CapacityGB = 500
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    },
-                    @{
-                        # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
-                        CapacityGB = 500
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    }
-                    @{
-                        # 3 is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
-                        VolumeType = 'Data'
-                        MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
-                        CapacityGB = 50
-                        VolumeStatus = 'FullyDecrypted'
-                        EncryptionPercentage = 0
-                        KeyProtector = @(
-                        )
-                        AutoUnlockEnabled = $null
-                        ProtectionStatus = 'Off'
-                    }
-                )
+        # Override Helper functions
+        function CheckForPreReqs {}
+        function RemoveParameters {}
+        function AddParameters {}
+        function TestBitlocker {}
+        function EnableBitlocker {}
+
+        Describe 'MSFT_xBLAutoBitlocker\Get-TargetResource' -Tag 'Get' {
+            AfterEach {
+                Assert-VerifiableMock
             }
+
+            $testDriveType = 'Fixed'
+            $testPrimaryProtector = 'TpmProtector'
+
+            Mock -CommandName Import-Module -Verifiable
+            Mock -CommandName CheckForPreReqs -Verifiable
+
+            Context 'When Get-TargetResource is called and CheckForPrereqs succeeds' {
+                It 'Should return a Hashtable with the input resource DriveType' {
+                    $getResult = Get-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector
+                    $getResult | Should -Be -Not $null
+                    $getResult.DriveType | Should -Be $testDriveType
+
+                }
+            }
+        }
+
+        Describe 'MSFT_xBLAutoBitlocker\Set-TargetResource' -Tag 'Set' {
+            AfterEach {
+                Assert-VerifiableMock
+            }
+
+            $testDriveType = 'Fixed'
+            $testPrimaryProtector = 'TpmProtector'
+
+            Mock -CommandName Import-Module -Verifiable
+            Mock -CommandName CheckForPreReqs -Verifiable
+
+            Context 'When Set-TargetResource is called, CheckForPrereqs succeeds, and GetAutoBitlockerStatus returns null' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable
+
+                It 'Should throw an exception' {
+                    { Set-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector } | Should -Throw -ExpectedMessage 'No Auto Bitlocker volumes were found'
+                }
+            }
+
+            Context 'When Set-TargetResource is called, CheckForPrereqs succeeds, GetAutoBitlockerStatus returns a valid hashtable, and TestBitlocker returns False' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable -MockWith {
+                    return @{
+                        Keys = @('Volume1')
+                    }
+                }
+                Mock -CommandName RemoveParameters -Verifiable
+                Mock -CommandName AddParameters -Verifiable
+                Mock -CommandName TestBitlocker -Verifiable -MockWith { return $false }
+                Mock -CommandName EnableBitlocker -Verifiable
+
+                It 'Should enable Bitlocker' {
+                    Set-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector
+                }
+            }
+
+            Context 'When Set-TargetResource is called, CheckForPrereqs succeeds, GetAutoBitlockerStatus returns a valid hashtable, and TestBitlocker returns True' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable -MockWith {
+                    return @{
+                        Keys = @('Volume1')
+                    }
+                }
+                Mock -CommandName RemoveParameters -Verifiable
+                Mock -CommandName AddParameters -Verifiable
+                Mock -CommandName TestBitlocker -Verifiable -MockWith { return $true }
+                Mock -CommandName EnableBitlocker
+
+                It 'Should not enable Bitlocker' {
+                    Set-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector
+
+                    Assert-MockCalled -CommandName EnableBitlocker -Times 0
+                }
+            }
+        }
+
+        Describe 'MSFT_xBLAutoBitlocker\Test-TargetResource' -Tag 'Test' {
+            AfterEach {
+                Assert-VerifiableMock
+            }
+
+            $testDriveType = 'Fixed'
+            $testPrimaryProtector = 'TpmProtector'
+
+            Mock -CommandName Import-Module -Verifiable
+            Mock -CommandName CheckForPreReqs -Verifiable
+
+            Context 'When Test-TargetResource is called, CheckForPrereqs succeeds, and GetAutoBitlockerStatus returns null' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable
+                Mock -CommandName Write-Error -Verifiable
+
+                It 'Should write an error and return false' {
+                    Test-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector | Should -Be $false
+                }
+            }
+
+            Context 'When Test-TargetResource is called, CheckForPrereqs succeeds, GetAutoBitlockerStatus returns a valid hashtable, and TestBitlocker returns False' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable -MockWith {
+                    return @{
+                        Keys = @('Volume1')
+                    }
+                }
+                Mock -CommandName RemoveParameters -Verifiable
+                Mock -CommandName AddParameters -Verifiable
+                Mock -CommandName TestBitlocker -Verifiable -MockWith { return $false }
+
+                It 'Should return False' {
+                    Test-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector | Should -Be $false
+                }
+            }
+
+            Context 'When Test-TargetResource is called, CheckForPrereqs succeeds, GetAutoBitlockerStatus returns a valid hashtable, and TestBitlocker returns True' {
+                Mock -CommandName GetAutoBitlockerStatus -Verifiable -MockWith {
+                    return @{
+                        Keys = @('Volume1')
+                    }
+                }
+                Mock -CommandName RemoveParameters -Verifiable
+                Mock -CommandName AddParameters -Verifiable
+                Mock -CommandName TestBitlocker -Verifiable -MockWith { return $true }
+
+                It 'Should return True' {
+                    Test-TargetResource -DriveType $testDriveType -PrimaryProtector $testPrimaryProtector | Should -Be $true
+                }
+            }
+        }
+
+        Describe 'MSFT_xBLAutoBitlocker\GetAutoBitlockerStatus' {
+        # Get-BitlockerVolume is used to obtain list of volumes in the system and their current encryption status
+            Mock `
+                -CommandName Get-BitlockerVolume `
+                -ModuleName 'MSFT_xBLAutoBitlocker' `
+                -MockWith {
+                    # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
+                    return @(
+                        @{
+                            # C: is OS drive
+                            VolumeType = 'OperatingSystem'
+                            MountPoint = 'C:'
+                            CapacityGB = 500
+                            VolumeStatus = 'FullyEncrypted'
+                            EncryptionPercentage = 100
+                            KeyProtector = @(
+                                @{
+                                    KeyProtectorType = 'Tpm'
+                                },
+                                @{
+                                    KeyProtectorType = 'RecoveryPassword'
+                                }
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'On'
+                        },
+                        @{
+                            # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = 'D:'
+                            CapacityGB = 500
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        },
+                        @{
+                            # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = 'E:'
+                            CapacityGB = 50
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        }
+                        @{
+                            # F: is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = 'F:'
+                            CapacityGB = 500
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        },
+                        @{
+                            # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                            CapacityGB = 500
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        },
+                        @{
+                            # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                            CapacityGB = 500
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        }
+                        @{
+                            # 3 is a Removable drive thumb drive, correctly reporting as Removable to Bitlocker
+                            VolumeType = 'Data'
+                            MountPoint = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                            CapacityGB = 50
+                            VolumeStatus = 'FullyDecrypted'
+                            EncryptionPercentage = 0
+                            KeyProtector = @(
+                            )
+                            AutoUnlockEnabled = $null
+                            ProtectionStatus = 'Off'
+                        }
+                    )
+                }
 
             # Get-Volume evaluates volume removable status correctly
             # This was used in broken version of the module, replaced in Issue #11 by Win32_EncryptableVolume class
             Mock `
-            -CommandName Get-Volume `
-            -ModuleName 'MSFT_xBLAutoBitlocker' `
-            -MockWith {
-                # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
+                -CommandName Get-Volume `
+                -ModuleName 'MSFT_xBLAutoBitlocker' `
+                -MockWith {
+                    # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
 
-                switch ($Path)
-                {
-                    '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                    switch ($Path)
                     {
-                        return @{
-                            # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                            DriveLetter = ''
-                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
-                            DriveType = 'Fixed'
+                        '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                        {
+                            return @{
+                                # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                                DriveLetter = ''
+                                Path = '\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                                DriveType = 'Fixed'
+                            }
                         }
-                    }
-                    '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
-                    {
-                        return @{
-                            # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
-                            DriveLetter = ''
-                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
-                            DriveType = 'Fixed'
+                        '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                        {
+                            return @{
+                                # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                                DriveLetter = ''
+                                Path = '\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                                DriveType = 'Fixed'
+                            }
                         }
-                    }
-                    '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
-                    {
-                        return @{
-                            # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
-                            DriveLetter = ''
-                            Path = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
-                            DriveType = 'Removable'
+                        '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                        {
+                            return @{
+                                # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
+                                DriveLetter = ''
+                                Path = '\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                                DriveType = 'Removable'
+                            }
                         }
-                    }
-                    default
-                    {
-                        throw "No MSFT_Volume objects found with property 'Path' equal to '$Path'.  Verify the value of the property and retry."
+                        default
+                        {
+                            throw "No MSFT_Volume objects found with property 'Path' equal to '$Path'.  Verify the value of the property and retry."
+                        }
                     }
                 }
-            }
 
             Mock `
-            -CommandName Get-CimInstance `
-            -ModuleName 'MSFT_xBLAutoBitlocker' `
-            -MockWith {
-                # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
-                return @(
-                    @{
-                        # C: is OS drive
-                        DriveLetter = 'C:'
-                        VolumeType=0
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000000}\'
+                -CommandName Get-CimInstance `
+                -ModuleName 'MSFT_xBLAutoBitlocker' `
+                -MockWith {
+                    # Returns a collection of OS/Fixed/Removable disks with correct/incorrect removable status
+                    return @(
+                        @{
+                            # C: is OS drive
+                            DriveLetter = 'C:'
+                            VolumeType=0
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000000}\'
 
-                    },
-                    @{
-                        # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                        DriveLetter = 'D:'
-                        VolumeType=2
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000004}\'
+                        },
+                        @{
+                            # D: is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                            DriveLetter = 'D:'
+                            VolumeType=2
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000004}\'
 
-                    },
-                    @{
-                        # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
-                        DriveLetter = 'E:'
-                        VolumeType=1
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000005}\'
+                        },
+                        @{
+                            # E: is Fixed drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = 'E:'
+                            VolumeType=1
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000005}\'
 
-                    },
-                    @{
-                        # F: is a Removable drive, correctly reporting as Fixed to Bitlocker
-                        DriveLetter = 'F:'
-                        VolumeType=2
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000006}\'
-                    },
-                    @{
-                        # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
-                        DriveLetter = ''
-                        VolumeType=2
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000001}\'
-                    },
-                    @{
-                        # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
-                        DriveLetter = ''
-                        VolumeType=1
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000002}\'
-                    },
-                    @{
-                        # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
-                        DriveLetter = ''
-                        VolumeType=2
-                        DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000003}\'
-                    }
+                        },
+                        @{
+                            # F: is a Removable drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = 'F:'
+                            VolumeType=2
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000006}\'
+                        },
+                        @{
+                            # 1 is Fixed drive, incorrectly reporting as Removable to Bitlocker
+                            DriveLetter = ''
+                            VolumeType=2
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000001}\'
+                        },
+                        @{
+                            # 2 is Fixed drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = ''
+                            VolumeType=1
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000002}\'
+                        },
+                        @{
+                            # 3 is a Removable drive, correctly reporting as Fixed to Bitlocker
+                            DriveLetter = ''
+                            VolumeType=2
+                            DeviceID='\\?\Volume{00000000-0000-0000-0000-000000000003}\'
+                        }
 
-                )
-            }
-
-        Describe 'MSFT_xBLAutoBitlocker\GetAutoBitlockerStatus' {
+                    )
+                }
 
             Context 'When Volume C: Reports as OS Volume' {
 
