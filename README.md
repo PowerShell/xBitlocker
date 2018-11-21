@@ -1,7 +1,7 @@
 # xBitlocker
 
 The **xBitlocker** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources produced by the PowerShell Team.
-This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm** resources.
+This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm, xWaitForBLEncryption** resources.
 This DSC Module allows you to configure Bitlocker on a single disk, configure a TPM chip, or automatically enable Bitlocker on multiple disks.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
@@ -38,7 +38,7 @@ To install **xBitlocker** module
 
 To confirm installation:
 
-* Run **Get-DSCResource** to see that **xBLAutoBitlocker, xBLBitlocker, xBLTpm** are among the DSC Resources listed
+* Run **Get-DSCResource** to see that **xBLAutoBitlocker, xBLBitlocker, xBLTpm, xWaitForBLEncryption** are among the DSC Resources listed
 
 ## Requirements
 
@@ -115,6 +115,14 @@ Defaults to false.
 *   AllowClear:Indicates that the provisioning process clears the TPM, if necessary, to move the TPM closer to complying with Windows Server 2012 standards
 *   AllowPhysicalPresence:Indicates that the provisioning process may send physical presence commands that require a user to be present in order to continue.
 *   AllowImmediateReboot:Whether the computer can rebooted immediately after initializing the TPM
+
+**xWaitForBLEncryption** adds the ability to wait for a unit to get fully encrypted. This allow you to
+make sure a full encryption happened before (depending on) going down the road on you DSC script.
+**xWaitForBLEncryption** has the following properties.
+
+*   *MountPoint:Drive letter to be checked for Encryption status and completeness.
+*   RetryIntervalSeconds:Indicates seconds to wait before checking back. Defaults to 60.
+*   RetryCount:Indicates how many times should retry before giving up. Defaults to 30.
 
 ## Versions
 
