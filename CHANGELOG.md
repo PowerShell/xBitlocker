@@ -1,6 +1,7 @@
 # Change log for xBitlocker
 
 ## Unreleased
+
 - Fixed issue causing Assert-HasPrereqsForBitlocker to fail on Windows 10.
   Credit: https://github.com/goldfinger2
   ([issue #47](https://github.com/PowerShell/xBitlocker/issues/47))
