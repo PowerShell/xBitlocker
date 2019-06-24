@@ -226,6 +226,15 @@ try
                 )
             }
 
+            function Get-WindowsOptionalFeature
+            {
+                param
+                (
+                    [string]
+                    $FeatureName
+                )
+            }
+
             function Get-OSEdition
             {
 
@@ -268,6 +277,36 @@ try
                 }
 
                 Mock -CommandName Get-WindowsFeature -MockWith {
+                    param
+                    (
+                        [string]
+                        $FeatureName
+                    )
+
+                    return @{
+                        DisplayName  = $FeatureName
+                        Name         = $FeatureName
+                        InstallState = 'Installed'
+                    }
+                }
+
+                It 'Should not generate any error messages' {
+                    Mock -CommandName Write-Error
+                    Assert-HasPrereqsForBitlocker
+                    Assert-MockCalled -Command Write-Error -Exactly -Times 0 -Scope It
+                }
+
+                It 'Should run the Assert-HasPrereqsForBitlocker function without exceptions' {
+                    {Assert-HasPrereqsForBitlocker} | Should -Not -Throw
+                }
+            }
+
+            Context 'When OS is a Windows client' {
+                Mock -CommandName Get-OSEdition -MockWith {
+                    return 'Client'
+                }
+
+                Mock -CommandName Get-WindowsOptionalFeature -MockWith {
                     param
                     (
                         [string]
@@ -420,6 +459,22 @@ try
 
                 $OSVersion = Get-OSEdition
                 $OSVersion | Should -Be 'Server'
+            }
+
+            It 'Should return "Client" if the OS is a Windows Client' {
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    [PSCustomObject] @{
+                        InstallationType = 'Client'
+                        PSPath           = 'Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\software\microsoft\windows nt\currentversion'
+                        PSParentPath     = 'Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\software\microsoft\windows nt'
+                        PSChildName      = 'currentversion'
+                        PSDrive          = 'HKLM'
+                        PSProvider       = 'Microsoft.PowerShell.Core\Registry'
+                    }
+                }
+
+                $OSVersion = Get-OSEdition
+                $OSVersion | Should -Be 'Client'
             }
 
             It 'Should run without exceptions' {

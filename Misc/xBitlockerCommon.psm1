@@ -788,29 +788,42 @@ function Assert-HasPrereqsForBitlocker
 
     $hasAllPreReqs = $true
 
-    $blFeature = Get-WindowsFeature BitLocker
-    $blAdminToolsFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker
-    $blAdminToolsRemoteFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker-RemoteAdminTool
-
-    if ($blFeature.InstallState -ne 'Installed')
+    if ((Get-OSEdition) -like 'Client')
     {
-        $hasAllPreReqs = $false
-
-        Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
+        $blFeature = Get-WindowsOptionalFeature BitLocker
+        if ($blFeature.InstallState -ne 'Installed')
+        {
+            $hasAllPreReqs = $false
+            Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
+        }
     }
-
-    if ($blAdminToolsFeature.InstallState -ne 'Installed')
+    else
     {
-        $hasAllPreReqs = $false
+        $blFeature = Get-WindowsFeature BitLocker
+        $blAdminToolsFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker
+        $blAdminToolsRemoteFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker-RemoteAdminTool
 
-        Write-Error 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
-    }
+        if ($blFeature.InstallState -ne 'Installed')
+        {
+            $hasAllPreReqs = $false
 
-    if ($blAdminToolsRemoteFeature.InstallState -ne 'Installed' -and (Get-OSEdition) -notmatch 'Core')
-    {
-        $hasAllPreReqs = $false
+            Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
+        }
 
-        Write-Error 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
+        if ($blAdminToolsFeature.InstallState -ne 'Installed')
+        {
+            $hasAllPreReqs = $false
+
+            Write-Error 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
+        }
+
+        if ($blAdminToolsRemoteFeature.InstallState -ne 'Installed' -and (Get-OSEdition) -notmatch 'Core')
+        {
+            $hasAllPreReqs = $false
+
+            Write-Error 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
+        }
+
     }
 
     if ($hasAllPreReqs -eq $false)
