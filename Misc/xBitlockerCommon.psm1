@@ -790,8 +790,8 @@ function Assert-HasPrereqsForBitlocker
 
     if ((Get-OSEdition) -like 'Client')
     {
-        $blFeature = Get-WindowsOptionalFeature BitLocker
-        if ($blFeature.InstallState -ne 'Installed')
+        $blFeature = Get-WindowsOptionalFeature -Online -FeatureName 'BitLocker'
+        if ($blFeature.State -ne 'Enabled')
         {
             $hasAllPreReqs = $false
             Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'

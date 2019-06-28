@@ -309,6 +309,8 @@ try
                 Mock -CommandName Get-WindowsOptionalFeature -MockWith {
                     param
                     (
+                        [switch]
+                        $online = $false,
                         [string]
                         $FeatureName
                     )
@@ -316,7 +318,7 @@ try
                     return @{
                         DisplayName  = $FeatureName
                         Name         = $FeatureName
-                        InstallState = 'Installed'
+                        State = 'Enabled'
                     }
                 }
 
