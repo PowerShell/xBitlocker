@@ -367,7 +367,9 @@ function Set-TargetResource
     else
     {
         Remove-FromPSBoundParametersUsingHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToRemove 'DriveType', 'MinDiskCapacityGB'
-        Add-ToPSBoundParametersFromHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToAdd @{'MountPoint' = ''}
+        Add-ToPSBoundParametersFromHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToAdd @{
+            'MountPoint' = ''
+        }
 
         # Loop through each potential AutoBitlocker volume, see whether they are enabled for Bitlocker, and if not, enable it
         foreach ($key in $autoBlVols.Keys)
@@ -575,7 +577,9 @@ function Test-TargetResource
     else
     {
         Remove-FromPSBoundParametersUsingHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToRemove 'DriveType', 'MinDiskCapacityGB'
-        Add-ToPSBoundParametersFromHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToAdd @{'MountPoint' = ''}
+        Add-ToPSBoundParametersFromHashtable -PSBoundParametersIn $PSBoundParameters -ParamsToAdd @{
+            'MountPoint' = ''
+        }
 
         # Check whether any potential AutoBitlocker volume is not currently enabled for Bitlocker, or doesn't have the correct settings
         foreach ($key in $autoBlVols.Keys)

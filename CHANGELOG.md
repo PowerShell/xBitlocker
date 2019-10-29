@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix hashtables according to the style guideline.
+
 ## 1.4.0.0
 
 - Change double quoted string literals to single quotes
