@@ -221,7 +221,7 @@ try
             {
                 param
                 (
-                    [string]
+                    [String]
                     $FeatureName
                 )
             }
@@ -230,7 +230,7 @@ try
             {
                 param
                 (
-                    [string]
+                    [String]
                     $FeatureName
                 )
             }
@@ -309,9 +309,9 @@ try
                 Mock -CommandName Get-WindowsOptionalFeature -MockWith {
                     param
                     (
-                        [switch]
-                        $online = $false,
-                        [string]
+                        [Switch]
+                        $Online = $false,
+                        [String]
                         $FeatureName
                     )
 

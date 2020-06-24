@@ -794,34 +794,34 @@ function Assert-HasPrereqsForBitlocker
         if ($blFeature.State -ne 'Enabled')
         {
             $hasAllPreReqs = $false
-            Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
+            Write-Error -Message 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
         }
     }
     else
     {
-        $blFeature = Get-WindowsFeature BitLocker
-        $blAdminToolsFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker
-        $blAdminToolsRemoteFeature = Get-WindowsFeature RSAT-Feature-Tools-BitLocker-RemoteAdminTool
+        $blFeature = Get-WindowsFeature -Name 'BitLocker'
+        $blAdminToolsFeature = Get-WindowsFeature -Name 'RSAT-Feature-Tools-BitLocker'
+        $blAdminToolsRemoteFeature = Get-WindowsFeature -Name 'RSAT-Feature-Tools-BitLocker-RemoteAdminTool'
 
         if ($blFeature.InstallState -ne 'Installed')
         {
             $hasAllPreReqs = $false
 
-            Write-Error 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
+            Write-Error -Message 'The Bitlocker feature needs to be installed before the xBitlocker module can be used'
         }
 
         if ($blAdminToolsFeature.InstallState -ne 'Installed')
         {
             $hasAllPreReqs = $false
 
-            Write-Error 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
+            Write-Error -Message 'The RSAT-Feature-Tools-BitLocker feature needs to be installed before the xBitlocker module can be used'
         }
 
         if ($blAdminToolsRemoteFeature.InstallState -ne 'Installed' -and (Get-OSEdition) -notmatch 'Core')
         {
             $hasAllPreReqs = $false
 
-            Write-Error 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
+            Write-Error -Message 'The RSAT-Feature-Tools-BitLocker-RemoteAdminTool feature needs to be installed before the xBitlocker module can be used'
         }
 
     }
