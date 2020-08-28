@@ -1,4 +1,3 @@
-﻿DSCResource.Tests
+output/
 .vs
 .vscode
-node_modules
