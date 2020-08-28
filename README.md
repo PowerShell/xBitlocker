@@ -1,8 +1,8 @@
 # xBitlocker
 
-[![Build Status](https://dev.azure.com/dsccommunity/xBitlocker/_apis/build/status/dsccommunity.xBitlocker?branchName=master)](https://dev.azure.com/dsccommunity/xBitlocker/_build/latest?definitionId={definitionId}&branchName=master)
-![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/xBitlocker/{definitionId}/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/xBitlocker/{definitionId}/master)](https://dsccommunity.visualstudio.com/xBitlocker/_test/analytics?definitionId={definitionId}&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/xBitlocker/_apis/build/status/dsccommunity.xBitlocker?branchName=master)](https://dev.azure.com/dsccommunity/xBitlocker/_build/latest?definitionId=46&branchName=master)
+![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/xBitlocker/46/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/xBitlocker/46/master)](https://dsccommunity.visualstudio.com/xBitlocker/_test/analytics?definitionId=46&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/xBitlocker?label=xBitlocker%20Preview)](https://www.powershellgallery.com/packages/xBitlocker/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/xBitlocker?label=xBitlocker)](https://www.powershellgallery.com/packages/xBitlocker/)
 
