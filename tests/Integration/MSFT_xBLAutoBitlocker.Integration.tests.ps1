@@ -1,25 +1,24 @@
 $script:dscModuleName = 'xBitlocker'
 $script:dscResourceFriendlyName = 'xBLAutoBitlocker'
-$script:dcsResourceName = "MSFT_$($script:dscResourceFriendlyName)"
+$script:dscResourceName = "MSFT_$($script:dscResourceFriendlyName)"
 
-#region HEADER
-# Integration Test Template Version: 1.3.1
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+try
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+}
+catch [System.IO.FileNotFoundException]
+{
+    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-$TestEnvironment = Initialize-TestEnvironment `
+$script:testEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dcsResourceName `
-    -TestType Integration
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
+    -TestType 'Integration'
 
 # Import xBitlocker Test Helper Module
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'Tests' -ChildPath (Join-Path -Path 'TestHelpers' -ChildPath 'xBitlockerTestHelper.psm1'))) -Force
-#endregion
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath (Join-Path -Path '..' -ChildPath (Join-Path -Path 'TestHelpers' -ChildPath 'xBitlockerTestHelper.psm1'))) -Force
 
 # Make sure required features are installed before running tests
 if (!(Test-RequiredFeaturesInstalled))
@@ -49,11 +48,11 @@ foreach ($fixedDriveBlv in $fixedDriveBlvs)
 try
 {
     #region Integration Tests
-    $configurationFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dcsResourceName).config.ps1"
+    $configurationFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configurationFile
 
-    Describe "$($script:dcsResourceName)_Integration" {
-        $configurationName = "$($script:dcsResourceName)_EnablePasswordProtectorOnDataDrives_Config"
+    Describe "$($script:dscResourceName)_Integration" {
+        $configurationName = "$($script:dscResourceName)_EnablePasswordProtectorOnDataDrives_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
