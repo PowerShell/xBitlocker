@@ -772,12 +772,12 @@ function Get-AutoBitlockerStatus
     )
 
     # First get all Bitlocker Volumes of type Data
-    $allBlvs = Get-BitLockerVolume | Where-Object -FilterScript {$_.VolumeType -eq 'Data'}
+    $allBlvs = Get-BitLockerVolume | Where-Object -FilterScript { $_.VolumeType -eq 'Data' }
 
     # Filter on size if it was specified
     if ($PSBoundParameters.ContainsKey('MinDiskCapacityGB'))
     {
-        $allBlvs = $allBlvs | Where-Object -FilterScript {$_.CapacityGB -ge $MinDiskCapacityGB}
+        $allBlvs = $allBlvs | Where-Object -FilterScript { $_.CapacityGB -ge $MinDiskCapacityGB }
     }
 
     # Now find disks of the appropriate drive type, and add them to the collection
@@ -807,19 +807,19 @@ function Get-AutoBitlockerStatus
             if (Split-Path -Path $blv.MountPoint -IsAbsolute)
             {
                 # MountPoint is a Drive Letter
-                $vol = $encryptableVolumes | Where-Object {($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue)}
+                $vol = $encryptableVolumes | Where-Object { ($_.DriveLetter -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue) }
             }
             else
             {
                 # MountPoint is a path
-                $vol = $encryptableVolumes | Where-Object {($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue)}
+                $vol = $encryptableVolumes | Where-Object { ($_.DeviceID -eq $blv.Mountpoint) -and ($_.VolumeType -eq $driveTypeValue) }
             }
 
             if ($null -ne $vol)
             {
                 [Hashtable] $props = @{
-                    VolumeStatus = $blv.VolumeStatus
-                    KeyProtectors = $blv.KeyProtector
+                    VolumeStatus     = $blv.VolumeStatus
+                    KeyProtectors    = $blv.KeyProtector
                     EncryptionMethod = $blv.EncryptionMethod
                 }
 

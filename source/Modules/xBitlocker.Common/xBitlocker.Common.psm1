@@ -81,12 +81,12 @@
 function Enable-BitlockerInternal
 {
     # Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot.
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope='Function', Target='DSCMachineStatus')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     <#
         Suppressing this rule because $global:DSCMachineStatus is only set,
         never used (by design of Desired State Configuration).
     #>
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Scope='Function', Target='DSCMachineStatus')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     [CmdletBinding()]
     param
     (
@@ -758,7 +758,7 @@ function Test-BitlockerEnabled
             }
             else # TpmProtector is primary
             {
-                if(!(Test-CollectionContainsKeyProtector -Type 'Tpm' -KeyProtectorCollection $blv.KeyProtector -StartsWith $true) -and !(Test-CollectionContainsKeyProtector -Type 'StartupKey' -KeyProtectorCollection $blv.KeyProtector -Contains $true))
+                if (!(Test-CollectionContainsKeyProtector -Type 'Tpm' -KeyProtectorCollection $blv.KeyProtector -StartsWith $true) -and !(Test-CollectionContainsKeyProtector -Type 'StartupKey' -KeyProtectorCollection $blv.KeyProtector -Contains $true))
                 {
                     Write-Verbose "MountPoint '$($MountPoint) 'does not have TPM + StartupKey protector."
                     return $false
@@ -784,7 +784,7 @@ function Test-BitlockerEnabled
 function Assert-HasPrereqsForBitlocker
 {
     [CmdletBinding()]
-    param()
+    param ()
 
     $hasAllPreReqs = $true
 
@@ -988,7 +988,7 @@ function Get-OSEdition
 {
     [CmdletBinding()]
     [OutputType([System.String])]
-    param()
+    param ()
 
     return (Get-ItemProperty -Path 'HKLM:/software/microsoft/windows nt/currentversion' -Name InstallationType).InstallationType
 }

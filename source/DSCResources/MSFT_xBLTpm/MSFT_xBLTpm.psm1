@@ -20,7 +20,7 @@
 #>
 function Get-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -82,13 +82,13 @@ function Get-TargetResource
 function Set-TargetResource
 {
     # Suppressing this rule because $global:DSCMachineStatus is used to trigger a reboot.
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope='Function', Target='DSCMachineStatus')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     <#
         Suppressing this rule because $global:DSCMachineStatus is only set,
         never used (by design of Desired State Configuration).
     #>
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Scope='Function', Target='DSCMachineStatus')]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     param
     (
@@ -163,7 +163,7 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
