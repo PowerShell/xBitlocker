@@ -1,54 +1,28 @@
 # xBitlocker
 
-The **xBitlocker** module is a part of the Windows PowerShell Desired State
-Configuration (DSC) Resource Kit, which is a collection of DSC Resources
-produced by the PowerShell Team.
-This module contains the **xBLAutoBitlocker, xBLBitlocker, xBLTpm** resources.
-This DSC Module allows you to configure Bitlocker on a single disk, configure a
+[![Build Status](https://dev.azure.com/dsccommunity/xBitlocker/_apis/build/status/dsccommunity.xBitlocker?branchName=master)](https://dev.azure.com/dsccommunity/xBitlocker/_build/latest?definitionId={definitionId}&branchName=master)
+![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/xBitlocker/{definitionId}/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/xBitlocker/{definitionId}/master)](https://dsccommunity.visualstudio.com/xBitlocker/_test/analytics?definitionId={definitionId}&contextType=build)
+[![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/xBitlocker?label=xBitlocker%20Preview)](https://www.powershellgallery.com/packages/xBitlocker/)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/xBitlocker?label=xBitlocker)](https://www.powershellgallery.com/packages/xBitlocker/)
+
+This DSC module allows you to configure Bitlocker on a single disk, configure a
 TPM chip, or automatically enable Bitlocker on multiple disks.
 
-This project has adopted the
-[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/)
-. For more information see the
-[Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
-additional questions or comments.
+## Code of Conduct
 
-## Branches
+This project has adopted this [Code of Conduct](CODE_OF_CONDUCT.md).
 
-### master
+## Releases
 
-[![Build status](https://ci.appveyor.com/api/projects/status/wi5i60tojfd7056b/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xBitlocker/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xBitlocker/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xBitlocker/branch/master)
-
-This is the branch containing the latest release -
-no contributions should be made directly to this branch.
-
-### dev
-
-[![Build status](https://ci.appveyor.com/api/projects/status/wi5i60tojfd7056b/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xBitlocker/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xBitlocker/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xBitlocker/branch/dev)
-
-This is the development branch
-to which contributions should be proposed by contributors as pull requests.
-This development branch will periodically be merged to the master branch,
-and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
+For each merge to the branch `master` a preview release will be
+deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
+Periodically a release version tag will be pushed which will deploy a
+full release to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 ## Contributing
 
-Please check out common DSC Resources
-[contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
-## Installation
-
-To install **xBitlocker** module
-
-* Unzip the content under $env:ProgramFiles\WindowsPowerShell\Modules folder
-
-To confirm installation:
-
-* Run **Get-DSCResource** to see that **xBLAutoBitlocker**, **xBLBitlocker**,
-  **xBLTpm** are among the DSC Resources listed.
+Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
 
 ## Requirements
 
@@ -56,10 +30,8 @@ This module requires that both the **Bitlocker** and
 **RSAT-Feature-Tools-Bitlocker** features are installed.
 It also requires the latest version of PowerShell (v4.0, which ships in Windows
 8.1 or Windows Server 2012R2).
-To easily use PowerShell 4.0 on older operating systems,
-[Install WMF 4.0](http://www.microsoft.com/en-us/download/details.aspx?id=40855)
-. Please read the installation instructions that are present on both the
-download page and the release notes for WMF 4.0.
+For more information on using PowerShell 4.0 on older operating systems,
+[Install WMF 4.0](https://social.technet.microsoft.com/wiki/contents/articles/21016.how-to-install-windows-powershell-4-0.aspx).
 
 ## Description
 
@@ -138,9 +110,7 @@ parameters.
 * TpmProtector
 * UsedSpaceOnly
 
-**xBLTpm** is used to initialize a TPM chip using
-[Initialize-TPM](https://docs.microsoft.com/en-us/powershell/module/trustedplatformmodule/initialize-tpm)
-.
+**xBLTpm** is used to initialize a TPM chip using [Initialize-TPM](https://docs.microsoft.com/en-us/powershell/module/trustedplatformmodule/initialize-tpm).
 **xBLTpm** has the following properties.
 
 * Identity: A required string value which is used as a Key for the resource.
@@ -156,17 +126,15 @@ parameters.
 
 ## Examples
 
-### [ConfigureBitlockerOnOSDrive](Examples/ConfigureBitlockerOnOSDrive)
+### [ConfigureBitlockerOnOSDrive](source/Examples/ConfigureBitlockerOnOSDrive)
 
- This example enables Bitlocker on an Operating System drive.
+This example enables Bitlocker on an Operating System drive.
 The example code for ConfigureBitlockerOnOSDrive is located in
-[`ConfigureBitlockerOnOSDrive.ps1`](Examples/ConfigureBitlockerOnOSDrive/ConfigureBitlockerOnOSDrive.ps1)
-.
+[`ConfigureBitlockerOnOSDrive.ps1`](source/Examples/ConfigureBitlockerOnOSDrive/ConfigureBitlockerOnOSDrive.ps1).
 
-### [ConfigureBitlockerAndAutoBitlocker](Examples/ConfigureBitlockerAndAutoBitlocker)
+### [ConfigureBitlockerAndAutoBitlocker](source/Examples/ConfigureBitlockerAndAutoBitlocker)
 
 Enables Bitlocker on an Operating System drive, and automatically enables
 Bitlocker on all drives of type 'Fixed'. The example code for
 ConfigureBitlockerAndAutoBitlocker is located in
-[`ConfigureBitlockerAndAutoBitlocker.ps1`](Examples/ConfigureBitlockerAndAutoBitlocker/ConfigureBitlockerAndAutoBitlocker.ps1)
-.
+[`ConfigureBitlockerAndAutoBitlocker.ps1`](source/Examples/ConfigureBitlockerAndAutoBitlocker/ConfigureBitlockerAndAutoBitlocker.ps1).

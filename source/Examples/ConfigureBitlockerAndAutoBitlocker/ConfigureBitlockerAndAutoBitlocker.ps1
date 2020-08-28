@@ -46,5 +46,3 @@ Configuration ConfigureBitlockerAndAutoBitlocker
         }
     }
 }
-
-ConfigureBitlockerAndAutoBitlocker

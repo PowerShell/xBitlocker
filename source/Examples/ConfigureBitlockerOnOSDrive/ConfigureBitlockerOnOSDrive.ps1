@@ -35,5 +35,3 @@ Configuration ConfigureBitlockerOnOSDrive
         }
     }
 }
-
-ConfigureBitlockerOnOSDrive
